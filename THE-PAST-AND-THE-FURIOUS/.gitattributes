@@ -3,7 +3,7 @@
 *.meta      text eol=lf
 *.unity     text eol=lf
 *.prefab   text eol=lf
-*.asset    text eol=lf
+*.asset    binary
 *.json     text eol=lf
 *.txt      text eol=lf
 *.yaml     text eol=lf
