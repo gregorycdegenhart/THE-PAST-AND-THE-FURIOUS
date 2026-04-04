@@ -27,7 +27,9 @@ public class CarController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.linearDamping = 0f;
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | 
+                 RigidbodyConstraints.FreezeRotationZ | 
+                 RigidbodyConstraints.FreezeRotationY;
         rb.centerOfMass = new Vector3(0, -0.5f, 0);
     }
 
@@ -82,10 +84,10 @@ public class CarController : MonoBehaviour
 
         rb.angularVelocity = new Vector3(0f, rb.angularVelocity.y, 0f);
 
-        flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        Vector3 correctedVel = Vector3.Project(flatVel, transform.forward);
-        rb.linearVelocity = correctedVel + Vector3.up * rb.linearVelocity.y;
-        rb.angularVelocity = new Vector3(0f, rb.angularVelocity.y, 0f);
+        // flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        // Vector3 correctedVel = Vector3.Project(flatVel, transform.forward);
+        // rb.linearVelocity = correctedVel + Vector3.up * rb.linearVelocity.y;
+        // rb.angularVelocity = new Vector3(0f, rb.angularVelocity.y, 0f);
     }
 
     public void OnMove(InputValue value)
