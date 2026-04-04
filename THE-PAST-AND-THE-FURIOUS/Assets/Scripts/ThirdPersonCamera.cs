@@ -7,7 +7,7 @@ public class ThirdPersonCamera : MonoBehaviour
     public Transform target;
 
     [Header("Input")]
-    public InputActionReference lookAction; // bind this to your Look action
+    public InputActionReference lookAction;
 
     [Header("Orbit")]
     public float distance = 6f;
@@ -23,9 +23,16 @@ public class ThirdPersonCamera : MonoBehaviour
     [Header("Cursor")]
     public bool lockCursorOnStart = true;
 
+    [Header("Turbo FOV")]
+    public CarController carController;
+    public float normalFov = 60f;
+    public float turboFov = 80f;
+    public float fovLerpSpeed = 6f;
+
     float yaw;
     float pitch = 0f;
     float idleTimer;
+    Camera cam;
 
     void OnEnable()
     {
@@ -37,12 +44,16 @@ public class ThirdPersonCamera : MonoBehaviour
 
         if (target != null)
         {
-            // set yaw to be exactly behind the player
             yaw = target.eulerAngles.y;
-
-            // set pitch to default value
             pitch = 0f;
-    }
+        }
+
+        cam = GetComponent<Camera>();
+        if (cam == null)
+            cam = Camera.main;
+
+        if (cam != null)
+            cam.fieldOfView = normalFov;
     }
 
     void OnDisable()
@@ -56,20 +67,23 @@ public class ThirdPersonCamera : MonoBehaviour
     void Update()
     {
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
             UnlockCursor();
-        }
 
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-        {
             LockCursor();
-        }
     }
 
     void LateUpdate()
     {
         if (target == null)
             return;
+
+        // FOV
+        if (cam != null && carController != null)
+        {
+            float targetFov = carController.IsTurboActive() ? turboFov : normalFov;
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFov, Time.deltaTime * fovLerpSpeed);
+        }
 
         Vector2 lookInput = Vector2.zero;
         if (lookAction != null)
@@ -92,10 +106,7 @@ public class ThirdPersonCamera : MonoBehaviour
             {
                 float targetYaw = target.eulerAngles.y;
                 yaw = Mathf.LerpAngle(yaw, targetYaw, Time.deltaTime * returnSpeed);
-                
-                // smoothly return pitch to default
-                float defaultPitch = 0f;
-                pitch = Mathf.Lerp(pitch, defaultPitch, Time.deltaTime * returnSpeed);
+                pitch = Mathf.Lerp(pitch, 0f, Time.deltaTime * returnSpeed);
             }
         }
 
