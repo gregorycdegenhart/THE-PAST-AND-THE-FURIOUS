@@ -254,7 +254,7 @@ TerrainCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -291,7 +291,7 @@ Terrain:
   m_StaticShadowCaster: 0
   m_IgnoreQualitySettings: 0
   m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 2100000, guid: 34a738b62a7c49245a7cf7cf5beefe8d, type: 2}
+  m_MaterialTemplate: {fileID: -175687467364540104, guid: c2b1c8f74fa6530419d38d39bb23ed90, type: 3}
   m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
@@ -349,7 +349,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1793885978}
-  - {fileID: 1946258828}
   - {fileID: 2080612202}
   - {fileID: 1220943643}
   m_Father: {fileID: 0}
@@ -991,7 +990,7 @@ GameObject:
   - component: {fileID: 1946258830}
   - component: {fileID: 1946258829}
   m_Layer: 0
-  m_Name: Cube (3)
+  m_Name: TRACK
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1005,12 +1004,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1946258827}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.07959511, z: -0, w: 0.9968273}
-  m_LocalPosition: {x: 139, y: -168.2, z: 161}
-  m_LocalScale: {x: 1640.8488, y: 287.70163, z: 1301.0157}
+  m_LocalRotation: {x: -0, y: 0.061838698, z: -0, w: 0.9980862}
+  m_LocalPosition: {x: -236.65924, y: -341, z: 1061.9238}
+  m_LocalScale: {x: 2890.5037, y: 671.5772, z: 2291.8567}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 435710497}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -9.131, z: 0}
 --- !u!65 &1946258829
 BoxCollider:
@@ -1058,7 +1057,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9c105903ce82c1347be377aa3cf8053f, type: 2}
+  - {fileID: 8748892135801146194, guid: ffc88ec805ad6084ba1daa8e0dcc972c, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1209,5 +1208,6 @@ SceneRoots:
   - {fileID: 1111262658}
   - {fileID: 417290515}
   - {fileID: 784396195}
+  - {fileID: 1946258828}
   - {fileID: 435710497}
   - {fileID: 682899039}
