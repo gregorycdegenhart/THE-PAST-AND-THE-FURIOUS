@@ -9,6 +9,7 @@ public class CarController : MonoBehaviour
     public float maxReverseSpeed = 10f;
     public float turnSpeed = 80f;
     public float deceleration = 10f;
+    private float speedMultiplier = 1f;
 
     private Rigidbody rb;
     private Vector2 moveInput;
@@ -31,8 +32,8 @@ public class CarController : MonoBehaviour
 
         if (moveInput.y > 0)
         {
-            speedAlongForward += moveInput.y * acceleration * Time.fixedDeltaTime;
-            speedAlongForward = Mathf.Clamp(speedAlongForward, -maxReverseSpeed, maxForwardSpeed);
+            speedAlongForward += moveInput.y * acceleration * speedMultiplier * Time.fixedDeltaTime;            
+            speedAlongForward = Mathf.Clamp(speedAlongForward, -maxReverseSpeed * speedMultiplier, maxForwardSpeed * speedMultiplier);
         }
         else if (moveInput.y < 0)
         {
@@ -65,5 +66,10 @@ public class CarController : MonoBehaviour
     public void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
+    }
+
+    public void SetSpeedMultiplier(float multiplier)
+    {
+        speedMultiplier = multiplier;
     }
 }
