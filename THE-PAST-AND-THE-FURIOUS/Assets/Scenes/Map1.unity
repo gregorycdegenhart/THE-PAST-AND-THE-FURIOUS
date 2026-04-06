@@ -480,6 +480,16 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 295541480517967614, guid: c3bf8ab4540f32f4a8b97431d4bb4b69, type: 3}
   m_PrefabInstance: {fileID: 366939565}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &185698801 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9105808140575430437, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+  m_PrefabInstance: {fileID: 682899039}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &218044438 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1089500230129287751, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+  m_PrefabInstance: {fileID: 682899039}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &249367181 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4716020324626186305, guid: bb14dc0c97ede704c85c99b5e68b394b, type: 3}
@@ -1646,6 +1656,14 @@ PrefabInstance:
       propertyPath: m_Mass
       value: 12000
       objectReference: {fileID: 0}
+    - target: {fileID: 2547605962829365429, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+      propertyPath: m_LinearDamping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2547605962829365429, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+      propertyPath: m_AngularDamping
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 2603415161401272815, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
       propertyPath: m_Name
       value: Player_BMW
@@ -1658,6 +1676,10 @@ PrefabInstance:
       propertyPath: far clip plane
       value: 1250
       objectReference: {fileID: 0}
+    - target: {fileID: 4227857488252992308, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+      propertyPath: rb
+      value: 
+      objectReference: {fileID: 905787399}
     - target: {fileID: 4227857488252992308, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
       propertyPath: acceleration
       value: 80
@@ -1722,10 +1744,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6156303139612931602, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6835295020792584879, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6835295020792584879, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2603415161401272815, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1525581224}
   m_SourcePrefab: {fileID: 100100000, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
 --- !u!1 &686912032
 GameObject:
@@ -2372,7 +2409,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4227857488252992308, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
   m_PrefabInstance: {fileID: 682899039}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1525581220}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 816bb3cfc81c7744ea8f7a07100d6646, type: 3}
@@ -2383,7 +2420,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7038584675057776124, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
   m_PrefabInstance: {fileID: 682899039}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1525581220}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
@@ -2494,6 +2531,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!4 &1086993687 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8389838117749254699, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+  m_PrefabInstance: {fileID: 682899039}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1096585018
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3707,6 +3749,29 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb14dc0c97ede704c85c99b5e68b394b, type: 3}
+--- !u!1 &1525581220 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2603415161401272815, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+  m_PrefabInstance: {fileID: 682899039}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1525581224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1525581220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 662ff3ff0c81df14383500c753b69331, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WheelVisuals
+  frontLeftWheel: {fileID: 185698801}
+  frontRightWheel: {fileID: 1086993687}
+  rearLeftWheel: {fileID: 218044438}
+  rearRightWheel: {fileID: 2021137662}
+  maxSteerAngle: 30
+  steerSpeed: 5
 --- !u!4 &1536248485 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 295541480517967614, guid: c3bf8ab4540f32f4a8b97431d4bb4b69, type: 3}
@@ -4906,6 +4971,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3bf8ab4540f32f4a8b97431d4bb4b69, type: 3}
+--- !u!4 &2021137662 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4759694374504773571, guid: 5a4a178d2faecd0469d1be0c367dd0b9, type: 3}
+  m_PrefabInstance: {fileID: 682899039}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2027950263
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5712,3 +5782,6 @@ SceneRoots:
   - {fileID: 318125580}
   - {fileID: 8516192161029953964}
   - {fileID: 1407257346}
+  - {fileID: 1924748716}
+  - {fileID: 2033112567}
+  - {fileID: 718373959}
