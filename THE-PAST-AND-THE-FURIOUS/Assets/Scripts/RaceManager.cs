@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class RaceManager : MonoBehaviour
 {
@@ -33,9 +34,12 @@ public class RaceManager : MonoBehaviour
     public float delayBeforeFade = 1f;
     public float fadeDuration = 1f;
     public string nextSceneName;
+    
+    [Header("UI")]
+    public TextMeshProUGUI lapText;
 
     // internal state
-    private int currentLap = 0;
+    private int currentLap = 1;
     private int nextExpectedCheckpoint = 0; // for laps mode
     private int currentCheckpoint = 0;      // for checkpoints mode
     private bool raceFinished = false;
@@ -50,6 +54,8 @@ public class RaceManager : MonoBehaviour
         // make sure fade starts invisible
         if (fadeGroup != null)
             fadeGroup.alpha = 0f;
+        
+        UpdateLapUI();
     }
 
     public static RaceManager Instance { get; private set; }
@@ -62,23 +68,29 @@ public class RaceManager : MonoBehaviour
         switch (raceType)
         {
             case RaceType.Laps:
-                // enforce ordered checkpoints
-                if (checkpointIndex >= 0 && checkpointIndex != nextExpectedCheckpoint)
+            // enforce ordered checkpoints
+                if (checkpointIndex != nextExpectedCheckpoint)
                     return;
 
-                // increment to next checkpoint
-                nextExpectedCheckpoint = checkpointIndex + 1;
+                // if this checkpoint is the one that ends the lap
+                if (completesLap)
+                {
+                    currentLap++;
+                    UpdateLapUI();
 
-                // only increment lap if this checkpoint completes a lap
-                if (!completesLap) return;
+                    Debug.Log("Lap completed: " + currentLap);
 
-                currentLap++;
-                nextExpectedCheckpoint = 0; // reset for next lap
+                    nextExpectedCheckpoint = 0;
 
-                Debug.Log("Lap completed: " + currentLap);
-
-                if (currentLap >= totalLaps)
-                    StartCoroutine(FinishRace());
+                    if (currentLap > totalLaps)
+                    {
+                        StartCoroutine(FinishRace());
+                    }
+                }
+                else
+                {
+                    nextExpectedCheckpoint++;
+                }
                 break;
 
             case RaceType.Checkpoints:
@@ -136,5 +148,10 @@ public class RaceManager : MonoBehaviour
         {
             SceneManager.LoadScene(nextSceneName);
         }
+    }
+
+    void UpdateLapUI() 
+    { 
+        if (lapText != null) lapText.text = "Lap " + currentLap + " / " + totalLaps; 
     }
 }
