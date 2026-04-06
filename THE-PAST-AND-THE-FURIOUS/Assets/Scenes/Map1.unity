@@ -3885,10 +3885,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 40135531851468709, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a6ed5fb980f51643acb201d8156e6d2, type: 2}
     - target: {fileID: 6261489926245253309, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
       propertyPath: m_Name
       value: Aztec_Sign (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 6431780394905972387, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a6ed5fb980f51643acb201d8156e6d2, type: 2}
     - target: {fileID: 6750499215563643399, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
       propertyPath: m_LocalPosition.x
       value: -310.7
@@ -3929,6 +3937,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9039336095451381277, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a6ed5fb980f51643acb201d8156e6d2, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4420,10 +4432,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 40135531851468709, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a6ed5fb980f51643acb201d8156e6d2, type: 2}
     - target: {fileID: 6261489926245253309, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
       propertyPath: m_Name
       value: Aztec_Sign (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 6431780394905972387, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a6ed5fb980f51643acb201d8156e6d2, type: 2}
     - target: {fileID: 6750499215563643399, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
       propertyPath: m_LocalPosition.x
       value: -569.903
@@ -4464,6 +4484,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9039336095451381277, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a6ed5fb980f51643acb201d8156e6d2, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6001,10 +6025,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 40135531851468709, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a6ed5fb980f51643acb201d8156e6d2, type: 2}
     - target: {fileID: 6261489926245253309, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
       propertyPath: m_Name
       value: Aztec_Sign (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 6431780394905972387, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a6ed5fb980f51643acb201d8156e6d2, type: 2}
     - target: {fileID: 6750499215563643399, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
       propertyPath: m_LocalPosition.x
       value: -748.6
@@ -6045,6 +6077,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9039336095451381277, guid: 12422b4db8212b24a855a69a25c68539, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a6ed5fb980f51643acb201d8156e6d2, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
