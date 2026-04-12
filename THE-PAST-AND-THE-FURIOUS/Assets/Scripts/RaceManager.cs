@@ -59,7 +59,14 @@ public class RaceManager : MonoBehaviour
         // make sure fade starts invisible
         if (fadeGroup != null)
             fadeGroup.alpha = 0f;
-        
+
+        // Auto-find lap text if not wired
+        if (lapText == null)
+        {
+            var go = GameObject.Find("LapText");
+            if (go != null) lapText = go.GetComponent<TMPro.TextMeshProUGUI>();
+        }
+
         UpdateLapUI();
     }
 
