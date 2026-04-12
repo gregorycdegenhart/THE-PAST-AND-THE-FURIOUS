@@ -11,6 +11,9 @@ public class LapCheckpoint : MonoBehaviour
     {
         if (other.CompareTag("Player") && RaceManager.Instance != null)
         {
+            // Don't register checkpoints before the race starts
+            if (!CountdownUI.RaceStarted) return;
+
             // Prevent double-firing from multiple colliders on the same car
             if (Time.time - lastTriggerTime < 0.5f) return;
             lastTriggerTime = Time.time;
