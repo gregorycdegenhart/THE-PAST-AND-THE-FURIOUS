@@ -435,7 +435,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0.00079672, y: -290}
-  m_SizeDelta: {x: 737.47, y: 125}
+  m_SizeDelta: {x: 730, y: 125}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &147572132
 MonoBehaviour:
@@ -913,7 +913,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0.00079883, y: 0.0000076293945}
-  m_SizeDelta: {x: 737.47, y: 125}
+  m_SizeDelta: {x: 730, y: 125}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &590666798
 MonoBehaviour:
@@ -1358,7 +1358,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0.00079737, y: 290}
-  m_SizeDelta: {x: 737.47, y: 125}
+  m_SizeDelta: {x: 730, y: 125}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &993200130
 MonoBehaviour:
@@ -1385,8 +1385,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28dd814401e1a7f4d9a211f66120f69f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButtonGlow
-  glowColor: {r: 0.7028302, g: 0.95524555, b: 1, a: 1}
-  glowWidth: 4
+  glowColor: {r: 0.7028302, g: 0.95524555, b: 1, a: 0}
+  glowWidth: 0
 --- !u!114 &993200132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1429,7 +1429,7 @@ MonoBehaviour:
     m_ColorMultiplier: 5
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 21300000, guid: 312d8eea6a9dabb45b1584f3a73f18fb, type: 3}
+    m_HighlightedSprite: {fileID: 21300000, guid: 1e612a3ecbb598747a91f8864d9c0ec1, type: 3}
     m_PressedSprite: {fileID: 0}
     m_SelectedSprite: {fileID: 0}
     m_DisabledSprite: {fileID: 0}
@@ -1469,7 +1469,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.15, g: 0.15, b: 0.15, a: 0.9}
+  m_Color: {r: 0.5613208, g: 0.8343448, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
