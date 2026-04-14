@@ -912,8 +912,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00079883, y: 0.0000076293945}
-  m_SizeDelta: {x: 730, y: 125}
+  m_AnchoredPosition: {x: -26.356, y: 0.0000076293945}
+  m_SizeDelta: {x: 780, y: 160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &590666798
 MonoBehaviour:
@@ -927,8 +927,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28dd814401e1a7f4d9a211f66120f69f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButtonGlow
-  glowColor: {r: 1, g: 0.15, b: 0.15, a: 0.9}
-  glowWidth: 4
+  glowColor: {r: 1, g: 0.15, b: 0.15, a: 1}
+  glowWidth: 0.5
 --- !u!114 &590666799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -961,7 +961,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 2
   m_Colors:
     m_NormalColor: {r: 0.5764706, g: 0.81960785, b: 0.99215686, a: 0.9}
     m_HighlightedColor: {r: 0.3, g: 0.1, b: 0.1, a: 1}
@@ -971,7 +971,7 @@ MonoBehaviour:
     m_ColorMultiplier: 5
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
+    m_HighlightedSprite: {fileID: 21300000, guid: 364bd06c9e686674a871ff88eeb26efa, type: 3}
     m_PressedSprite: {fileID: 0}
     m_SelectedSprite: {fileID: 0}
     m_DisabledSprite: {fileID: 0}
@@ -999,14 +999,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.15, g: 0.15, b: 0.15, a: 0.9}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.9}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 77b35637b10c7fc418ae014ef51d4f29, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2aac8d024dcb1194580c4f42f86bcd6f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1050,14 +1050,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 708192703}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
@@ -1102,7 +1102,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
@@ -1357,8 +1357,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00079737, y: 290}
-  m_SizeDelta: {x: 730, y: 125}
+  m_AnchoredPosition: {x: -25.88, y: 249}
+  m_SizeDelta: {x: 780, y: 160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &993200130
 MonoBehaviour:
@@ -1385,8 +1385,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28dd814401e1a7f4d9a211f66120f69f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButtonGlow
-  glowColor: {r: 0.7028302, g: 0.95524555, b: 1, a: 0}
-  glowWidth: 0
+  glowColor: {r: 1, g: 0, b: 0.08988762, a: 1}
+  glowWidth: 0.5
 --- !u!114 &993200132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1429,7 +1429,7 @@ MonoBehaviour:
     m_ColorMultiplier: 5
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 21300000, guid: 1e612a3ecbb598747a91f8864d9c0ec1, type: 3}
+    m_HighlightedSprite: {fileID: 21300000, guid: 20b0e667131bbb54f80bae6aaa2438a5, type: 3}
     m_PressedSprite: {fileID: 0}
     m_SelectedSprite: {fileID: 0}
     m_DisabledSprite: {fileID: 0}
@@ -1469,14 +1469,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5613208, g: 0.8343448, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 17d208ed1e35fbc4c86200c2fbdf8671, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1e43cad157a808141a4d9352cd0b9026, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1830,8 +1830,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 576.4664, y: -0.00030021}
-  m_SizeDelta: {x: 737.4716, y: 886.59}
+  m_AnchoredPosition: {x: 543, y: 0.15448}
+  m_SizeDelta: {x: 832.7111, y: 1028.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1232057668
 MonoBehaviour:
@@ -2399,6 +2399,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
