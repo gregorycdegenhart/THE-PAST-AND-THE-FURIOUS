@@ -26,7 +26,7 @@ public class MusicManager : MonoBehaviour
 
     [Header("Settings")]
     public float volume = 0.5f;
-    public bool shuffle = false;
+    public bool shuffle = true;
 
     private AudioSource musicSource;
     private int currentTrackIndex = 0;
@@ -66,7 +66,11 @@ public class MusicManager : MonoBehaviour
     void Start()
     {
         if (playlist != null && playlist.Length > 0)
+        {
+            if (shuffle)
+                currentTrackIndex = Random.Range(0, playlist.Length);
             PlayTrack(currentTrackIndex);
+        }
     }
 
     void Update()

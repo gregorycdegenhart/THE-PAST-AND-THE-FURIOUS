@@ -47,4 +47,4 @@ MonoBehaviour:
   playlist: []
   songNames: []
   volume: 0.5
-  shuffle: 0
+  shuffle: 1
