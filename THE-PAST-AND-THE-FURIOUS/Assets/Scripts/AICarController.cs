@@ -112,6 +112,7 @@ public class AICarController : MonoBehaviour
     private float currentSpeed = 0f;
     private float coastDistance = 0f;
     private bool waitingForFinalFinishCross = false;
+    private float externalSpeedMultiplier = 1f;
 
     private static AICarController[] allAICars;
 
@@ -203,6 +204,7 @@ public class AICarController : MonoBehaviour
         targetSpeed *= cornerBrake;
 
         targetSpeed *= GetRubberBandMultiplier();
+        targetSpeed *= externalSpeedMultiplier;
 
         // Don't fire a new turbo while steering through a real corner — the extra speed
         // is exactly what sends the AI off the track. Finish the turn first.
@@ -579,6 +581,7 @@ public class AICarController : MonoBehaviour
                 // That's the real finish-line crossing — NOW start coasting to a stop.
                 raceFinished = true;
                 waitingForFinalFinishCross = false;
+                if (RaceManager.Instance != null) RaceManager.Instance.RegisterAIFinish();
                 Debug.Log(gameObject.name + " finished the race (crossed WP_00)!");
             }
         }
@@ -587,6 +590,7 @@ public class AICarController : MonoBehaviour
             if (currentWaypointIndex >= waypointPath.WaypointCount)
             {
                 raceFinished = true;
+                if (RaceManager.Instance != null) RaceManager.Instance.RegisterAIFinish();
                 Debug.Log(gameObject.name + " finished the race!");
             }
         }
@@ -594,4 +598,8 @@ public class AICarController : MonoBehaviour
 
     public bool IsTurboActive() => isTurboActive;
     public float GetCooldownProgress() => cooldownTimer > 0f ? cooldownTimer / turboCooldown : 0f;
+
+    // Mirrors CarController.SetSpeedMultiplier so power-ups (slow-mo, future buffs)
+    // can affect AI the same way they affect the player.
+    public void SetSpeedMultiplier(float multiplier) => externalSpeedMultiplier = multiplier;
 }

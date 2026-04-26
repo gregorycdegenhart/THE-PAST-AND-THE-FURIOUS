@@ -40,6 +40,11 @@ public class UIAudioManager : MonoBehaviour
         source.playOnAwake = false;
         source.spatialBlend = 0f;
         source.volume = volume;
+        // PauseMenu sets AudioListener.pause = true while paused. Without this flag,
+        // UI hover/click sounds get muted along with the world audio — so the pause
+        // menu and music widget would be silent on hover/click. MusicManager already
+        // opts out the same way for its music source.
+        source.ignoreListenerPause = true;
 
         if (hoverClip == null) hoverClip = GenerateHoverClip();
         if (clickClip == null) clickClip = GenerateClickClip();

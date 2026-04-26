@@ -39,15 +39,18 @@ public class RaceManager : MonoBehaviour
     public GameOverScreen gameOverScreen;
     public float raceTimeLimit = 0f; // 0 = no limit
 
+    [Tooltip("If this many AI finish before the player, the player loses (4th place or worse). Set to 0 to disable.")]
+    public int loseIfBeatenByCount = 3;
+
     [Header("UI")]
     public TextMeshProUGUI lapText;
 
     // internal state
     private float raceElapsed = 0f;
     private int currentLap = 1;
-    private int nextExpectedCheckpoint = 0; // for laps mode
     private int currentCheckpoint = 0;      // for checkpoints mode
     private bool raceFinished = false;
+    private int aiFinishCount = 0;
     private System.Collections.Generic.HashSet<int> visitedCheckpoints = new System.Collections.Generic.HashSet<int>();
 
     void Awake()
@@ -74,6 +77,17 @@ public class RaceManager : MonoBehaviour
     public static RaceManager Instance { get; private set; }
     public bool IsRaceFinished => raceFinished;
     public int GetVisitedCount() => visitedCheckpoints.Count;
+    public int GetAIFinishCount() => aiFinishCount;
+    public int GetPlayerPosition() => aiFinishCount + 1; // 1-based; called when the player crosses the line
+
+    /// <summary>
+    /// Each AI calls this when it crosses the finish line. Used to compute the player's
+    /// final position when they finish (player position = aiFinishCount + 1).
+    /// </summary>
+    public void RegisterAIFinish()
+    {
+        aiFinishCount++;
+    }
 
     void Update()
     {
@@ -152,6 +166,10 @@ public class RaceManager : MonoBehaviour
     {
         raceFinished = true;
 
+        // Lose if too many AI finished ahead of us. We check here (after raceFinished is set)
+        // so the player still gets the coast-out animation, then game over takes over.
+        bool playerLost = loseIfBeatenByCount > 0 && aiFinishCount >= loseIfBeatenByCount;
+
         // disable player input
         if (playerInput != null)
             playerInput.DeactivateInput();
@@ -170,7 +188,18 @@ public class RaceManager : MonoBehaviour
         if (delayBeforeFade > 0f)
             yield return new WaitForSecondsRealtime(delayBeforeFade);
 
-        // fade to black
+        // Loss path: show GameOverScreen with the player's position. Skip the fade — the
+        // game-over panel takes over the screen and a black overlay would just hide it.
+        if (playerLost)
+        {
+            int pos = aiFinishCount + 1;
+            string suffix = PositionSuffix(pos);
+            if (gameOverScreen != null)
+                gameOverScreen.ShowGameOver($"You finished {pos}{suffix}");
+            yield break;
+        }
+
+        // Win path: fade to black, then load the next scene.
         if (fadeGroup != null)
         {
             float t = 0f;
@@ -184,10 +213,22 @@ public class RaceManager : MonoBehaviour
             fadeGroup.alpha = 1f;
         }
 
-        // load next scene if set
         if (!string.IsNullOrEmpty(nextSceneName))
         {
             SceneManager.LoadScene(nextSceneName);
+        }
+    }
+
+    static string PositionSuffix(int n)
+    {
+        int mod100 = n % 100;
+        if (mod100 >= 11 && mod100 <= 13) return "th";
+        switch (n % 10)
+        {
+            case 1: return "st";
+            case 2: return "nd";
+            case 3: return "rd";
+            default: return "th";
         }
     }
 

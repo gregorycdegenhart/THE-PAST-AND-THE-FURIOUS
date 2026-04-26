@@ -13,6 +13,8 @@ public class SpeedometerNeedle : MonoBehaviour
 
     void Update()
     {
+        if (carRigidbody == null) return;
+
         float metersPerSecond = carRigidbody.linearVelocity.magnitude;
         float mph = Mathf.Clamp(metersPerSecond * 2.237f, 0f, maxMPH);
 

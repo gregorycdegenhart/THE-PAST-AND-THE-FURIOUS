@@ -27,6 +27,10 @@ public class WheelVisuals : MonoBehaviour
 
     void Update()
     {
+        // AI cars have CarController stripped by AIRaceGridSpawner but keep WheelVisuals.
+        // Without this guard, every AI car throws NullReferenceException every frame.
+        if (carController == null) return;
+
         HandleSteering();
         HandleSpin();
     }
@@ -49,6 +53,7 @@ public class WheelVisuals : MonoBehaviour
 
     void HandleSpin()
     {
+        if (carController.rb == null) return;
         float forwardSpeed = Vector3.Dot(carController.rb.linearVelocity, carController.transform.forward);
         float rpm = forwardSpeed / (2f * Mathf.PI * wheelRadius) * 360f;
         spinAngle += rpm * Time.deltaTime;

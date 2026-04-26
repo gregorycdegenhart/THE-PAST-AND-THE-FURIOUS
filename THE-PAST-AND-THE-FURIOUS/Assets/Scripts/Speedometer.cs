@@ -13,11 +13,11 @@ public class Speedometer : MonoBehaviour
 
     void Update()
     {
-        // Get speed in Unity units/sec, convert to MPH
+        if (carRigidbody == null || speedText == null) return;
+
         float metersPerSecond = carRigidbody.linearVelocity.magnitude;
         float mph = Mathf.Clamp(metersPerSecond * 2.237f, 0f, maxDisplayMPH);
 
-        // Round it and display it
         speedText.text = string.Format(displayFormat, Mathf.RoundToInt(mph));
     }
 }

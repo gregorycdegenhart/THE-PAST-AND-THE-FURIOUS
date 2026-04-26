@@ -16,7 +16,9 @@ public class SlowMoPowerup : MonoBehaviour
         if (active) return;
         active = true;
 
-        GameObject picker = other.gameObject;
+        GameObject picker = other.attachedRigidbody != null
+            ? other.attachedRigidbody.gameObject
+            : other.gameObject;
 
         StartCoroutine(ApplySlowMo(picker));
 
@@ -25,49 +27,36 @@ public class SlowMoPowerup : MonoBehaviour
 
     IEnumerator ApplySlowMo(GameObject picker)
     {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        GameObject[] opponents = GameObject.FindGameObjectsWithTag("Opponent");
+        // Slow EVERY car except the picker (player + AI). The picker's tag is
+        // "Player" or "Opponent"; the AI cars are spawned as "Untagged" by the
+        // grid spawner, so we sweep every active controller of each kind.
+        var players = Object.FindObjectsByType<CarController>(FindObjectsSortMode.None);
+        var aiCars = Object.FindObjectsByType<AICarController>(FindObjectsSortMode.None);
 
-        // Slow down all other players
-        foreach (GameObject obj in players)
+        foreach (var car in players)
         {
-            if (obj == picker) continue;
-
-            CarController car = obj.GetComponent<CarController>();
-            if (car != null)
-                car.SetSpeedMultiplier(slowMultiplier);
+            if (car == null || car.gameObject == picker) continue;
+            car.SetSpeedMultiplier(slowMultiplier);
         }
 
-        // Slow down AI opponents
-        foreach (GameObject obj in opponents)
+        foreach (var ai in aiCars)
         {
-            if (obj == picker) continue;
-
-            // TODO: Add AICarController.SetSpeedMultiplier() when AI is implemented
-            CarController car = obj.GetComponent<CarController>();
-            if (car != null)
-                car.SetSpeedMultiplier(slowMultiplier);
+            if (ai == null || ai.gameObject == picker) continue;
+            ai.SetSpeedMultiplier(slowMultiplier);
         }
 
         yield return new WaitForSeconds(duration);
 
-        // Reset everyone back to normal
-        foreach (GameObject obj in players)
+        foreach (var car in players)
         {
-            if (obj == picker) continue;
-
-            CarController car = obj.GetComponent<CarController>();
-            if (car != null)
-                car.SetSpeedMultiplier(1f);
+            if (car == null || car.gameObject == picker) continue;
+            car.SetSpeedMultiplier(1f);
         }
 
-        foreach (GameObject obj in opponents)
+        foreach (var ai in aiCars)
         {
-            if (obj == picker) continue;
-
-            CarController car = obj.GetComponent<CarController>();
-            if (car != null)
-                car.SetSpeedMultiplier(1f);
+            if (ai == null || ai.gameObject == picker) continue;
+            ai.SetSpeedMultiplier(1f);
         }
     }
 }

@@ -83,11 +83,18 @@ public class GarageManager : MonoBehaviour
     void WireButton(string name, UnityEngine.Events.UnityAction action)
     {
         var btn = FindInScene(name);
-        if (btn != null)
+        if (btn == null)
         {
-            var button = btn.GetComponent<UnityEngine.UI.Button>();
-            if (button != null) button.onClick.AddListener(action);
+            Debug.LogWarning($"[GarageManager] Button '{name}' not found in any Canvas.");
+            return;
         }
+        var button = btn.GetComponent<UnityEngine.UI.Button>();
+        if (button == null) return;
+        // Don't add a script listener if the Inspector already wired this button —
+        // double-listeners cause NextCar to fire twice per click and pick the wrong map.
+        if (button.onClick.GetPersistentEventCount() > 0) return;
+        button.onClick.RemoveListener(action);
+        button.onClick.AddListener(action);
     }
 
     TextMeshProUGUI FindText(string name)
@@ -98,11 +105,22 @@ public class GarageManager : MonoBehaviour
 
     GameObject FindInScene(string name)
     {
-        // Search in all canvases
         foreach (var canvas in FindObjectsByType<Canvas>(FindObjectsSortMode.None))
         {
-            Transform t = canvas.transform.Find(name);
+            Transform t = FindDeep(canvas.transform, name);
             if (t != null) return t.gameObject;
+        }
+        return null;
+    }
+
+    static Transform FindDeep(Transform parent, string name)
+    {
+        if (parent == null) return null;
+        if (parent.name == name) return parent;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform found = FindDeep(parent.GetChild(i), name);
+            if (found != null) return found;
         }
         return null;
     }
@@ -133,6 +151,7 @@ public class GarageManager : MonoBehaviour
     public void NextCar()
     {
         selectedCarIndex = (selectedCarIndex + 1) % cars.Length;
+        Debug.Log($"[GarageManager] NextCar -> index={selectedCarIndex} name={cars[selectedCarIndex].carName} map={cars[selectedCarIndex].mapSceneName}");
         OnCarChanged();
     }
 
@@ -140,6 +159,7 @@ public class GarageManager : MonoBehaviour
     {
         selectedCarIndex--;
         if (selectedCarIndex < 0) selectedCarIndex = cars.Length - 1;
+        Debug.Log($"[GarageManager] PreviousCar -> index={selectedCarIndex} name={cars[selectedCarIndex].carName} map={cars[selectedCarIndex].mapSceneName}");
         OnCarChanged();
     }
 
@@ -169,7 +189,27 @@ public class GarageManager : MonoBehaviour
     // --- Confirm & Race ---
     public void ConfirmAndRace()
     {
+        if (cars == null || cars.Length == 0)
+        {
+            Debug.LogError("[GarageManager] cars array is empty.");
+            return;
+        }
+        if (selectedCarIndex < 0 || selectedCarIndex >= cars.Length)
+        {
+            Debug.LogError($"[GarageManager] selectedCarIndex {selectedCarIndex} out of range (cars.Length={cars.Length}).");
+            return;
+        }
+
         CarEntry car = cars[selectedCarIndex];
+        if (string.IsNullOrEmpty(car.mapSceneName))
+        {
+            Debug.LogError($"[GarageManager] cars[{selectedCarIndex}] ({car.carName}) has no mapSceneName set in the inspector.");
+            return;
+        }
+
+        // If the loaded scene doesn't match the displayed car, the inspector array
+        // is misaligned — the map field of cars[N] is not the map you intended.
+        Debug.Log($"[GarageManager] ConfirmAndRace -> index={selectedCarIndex} car={car.carName} loading scene='{car.mapSceneName}'");
 
         PlayerPrefs.SetInt("SelectedCar", selectedCarIndex);
         PlayerPrefs.SetInt("SelectedDriver", selectedDriverIndex);
