@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class HowToPlayScreen : MonoBehaviour
@@ -36,7 +37,16 @@ public class HowToPlayScreen : MonoBehaviour
 
         if (howToPlayPanel != null && howToPlayPanel.activeSelf)
         {
+            // Check both new InputSystem and legacy Input — same pattern as PauseMenu.
+            // Either path closes the panel; we want this to work regardless of which
+            // input mode is active in the project's settings.
+            bool escPressed = false;
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+                escPressed = true;
             if (Input.GetKeyDown(KeyCode.Escape))
+                escPressed = true;
+
+            if (escPressed)
                 Close();
         }
     }
