@@ -14,13 +14,10 @@ public class MenuUIManager : MonoBehaviour
     void Start()
     {
         // Main menu only at start
-        mainMenuPanel.SetActive(true);
-
-        settingsPanel.SetActive(false);
-        controlsPanel.SetActive(false);
-
-        if (audioCanvas != null)
-            audioCanvas.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (controlsPanel != null) controlsPanel.SetActive(false);
+        if (audioCanvas != null) audioCanvas.SetActive(false);
     }
 
     // -------- SETTINGS NAV --------

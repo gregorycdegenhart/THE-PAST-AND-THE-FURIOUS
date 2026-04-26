@@ -27,9 +27,7 @@ public class MusicPlaylistUI : MonoBehaviour
 
     private float showTimer = 0f;
     private bool isVisible = false;
-    private string lastSongName = "";
     private TextMeshProUGUI playPauseText;
-    private bool wasPaused = false;
 
     void Start()
     {

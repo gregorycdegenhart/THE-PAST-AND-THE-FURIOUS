@@ -205,10 +205,16 @@ public class MusicManager : MonoBehaviour
     {
         if (playlist == null || playlist.Length == 0) return;
 
-        if (shuffle)
-            currentTrackIndex = Random.Range(0, playlist.Length);
+        if (shuffle && playlist.Length > 1)
+        {
+            // Pick a random offset in [1, length-1] so we never re-roll the song that just ended.
+            int offset = Random.Range(1, playlist.Length);
+            currentTrackIndex = (currentTrackIndex + offset) % playlist.Length;
+        }
         else
+        {
             currentTrackIndex = (currentTrackIndex + 1) % playlist.Length;
+        }
 
         PlayTrack(currentTrackIndex);
     }

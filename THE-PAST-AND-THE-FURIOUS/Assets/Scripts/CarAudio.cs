@@ -210,8 +210,4 @@ public class CarAudio : MonoBehaviour
         return clip;
     }
 
-    static float Sawtooth(float time, float frequency)
-    {
-        return 2f * ((time * frequency) % 1f) - 1f;
-    }
 }

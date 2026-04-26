@@ -128,7 +128,12 @@ public class AICarController : MonoBehaviour
 
     void Start()
     {
-        allAICars = FindObjectsByType<AICarController>(FindObjectsSortMode.None);
+        // Static cache shared across every AI in the scene. Only the first AI's Start
+        // populates it; the rest see the cached array and skip the scene scan.
+        // Stale entries (AIs destroyed mid-race) are tolerated via the null check
+        // inside ApplySeparation.
+        if (allAICars == null || allAICars.Length == 0)
+            allAICars = FindObjectsByType<AICarController>(FindObjectsSortMode.None);
     }
 
     void Update()

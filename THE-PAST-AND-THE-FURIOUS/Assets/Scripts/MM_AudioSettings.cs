@@ -16,7 +16,8 @@ public class AudioSettings : MonoBehaviour
         float savedVolume = PlayerPrefs.GetFloat(VolumeKey, 1f);
         savedVolume = Mathf.Clamp01(savedVolume);
 
-        volumeSlider.value = savedVolume;
+        if (volumeSlider != null)
+            volumeSlider.value = savedVolume;
 
         ApplyVolume(savedVolume);
     }

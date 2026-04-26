@@ -8,7 +8,11 @@ public class AIWaypointPath : MonoBehaviour
     public Transform GetWaypoint(int index)
     {
         if (waypoints == null || waypoints.Length == 0) return null;
-        return waypoints[index % waypoints.Length];
+        // C# modulo preserves the sign of the dividend, so a negative index would
+        // throw IndexOutOfRangeException. Wrap into [0, Length) explicitly.
+        int wrapped = index % waypoints.Length;
+        if (wrapped < 0) wrapped += waypoints.Length;
+        return waypoints[wrapped];
     }
 
     public int WaypointCount => waypoints != null ? waypoints.Length : 0;

@@ -51,6 +51,7 @@ public class RaceManager : MonoBehaviour
     private int currentCheckpoint = 0;      // for checkpoints mode
     private bool raceFinished = false;
     private int aiFinishCount = 0;
+    private int nonFinishCheckpointCount = -1; // computed once on first lap completion
     private System.Collections.Generic.HashSet<int> visitedCheckpoints = new System.Collections.Generic.HashSet<int>();
 
     void Awake()
@@ -234,12 +235,18 @@ public class RaceManager : MonoBehaviour
 
     int GetNonFinishCheckpointCount()
     {
-        int count = 0;
-        foreach (var cp in Object.FindObjectsByType<LapCheckpoint>(FindObjectsSortMode.None))
+        // Cache the count after the first scan — checkpoints don't appear/disappear
+        // mid-race, so re-scanning the scene on every lap completion was wasted work.
+        if (nonFinishCheckpointCount < 0)
         {
-            if (!cp.completesLap) count++;
+            int count = 0;
+            foreach (var cp in Object.FindObjectsByType<LapCheckpoint>(FindObjectsSortMode.None))
+            {
+                if (!cp.completesLap) count++;
+            }
+            nonFinishCheckpointCount = count;
         }
-        return count;
+        return nonFinishCheckpointCount;
     }
 
     void UpdateLapUI() 

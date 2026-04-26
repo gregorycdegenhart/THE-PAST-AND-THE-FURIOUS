@@ -28,16 +28,16 @@ public class CountdownUI : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(0.5f);
 
-        countdownText.text = "3";
+        SetCountdownText("3");
         yield return new WaitForSecondsRealtime(1f);
 
-        countdownText.text = "2";
+        SetCountdownText("2");
         yield return new WaitForSecondsRealtime(1f);
 
-        countdownText.text = "1";
+        SetCountdownText("1");
         yield return new WaitForSecondsRealtime(1f);
 
-        countdownText.text = "GO!";
+        SetCountdownText("GO!");
 
         if (playerInput != null)
             playerInput.ActivateInput();
@@ -46,6 +46,12 @@ public class CountdownUI : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.5f);
 
-        countdownText.text = "";
+        SetCountdownText("");
+    }
+
+    void SetCountdownText(string value)
+    {
+        if (countdownText != null)
+            countdownText.text = value;
     }
 }
