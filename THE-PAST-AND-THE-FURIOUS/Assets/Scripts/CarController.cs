@@ -59,9 +59,10 @@ public class CarController : MonoBehaviour
         rb.linearDamping = 0f;
         rb.angularDamping = 2f;
 
-        rb.constraints = RigidbodyConstraints.FreezeRotationX |
+        rb.constraints = RigidbodyConstraints.None;
+        /* rb.constraints = RigidbodyConstraints.FreezeRotationX |
                          RigidbodyConstraints.FreezeRotationZ |
-                         RigidbodyConstraints.FreezeRotationY;
+                         RigidbodyConstraints.FreezeRotationY; */
 
         rb.centerOfMass = centerOfMassOffset;
         rb.useGravity = true;
