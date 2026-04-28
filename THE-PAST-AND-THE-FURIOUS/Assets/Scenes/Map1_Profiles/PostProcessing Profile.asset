@@ -89,6 +89,7 @@ MonoBehaviour:
   - {fileID: 7593489200562155400}
   - {fileID: -9089765492054619649}
   - {fileID: -7573856232308135015}
+  - {fileID: 9075290969121584437}
 --- !u!114 &7593489200562155400
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -141,3 +142,40 @@ MonoBehaviour:
   quality:
     overrideState: 0
     value: 2
+--- !u!114 &9075290969121584437
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a34fa72bd4185749832024e9c8010bf, type: 3}
+  m_Name: ScreenSpaceReflections
+  m_EditorClassIdentifier: Unity.Postprocessing.Runtime::UnityEngine.Rendering.PostProcessing.ScreenSpaceReflections
+  active: 0
+  enabled:
+    overrideState: 1
+    value: 1
+  preset:
+    overrideState: 0
+    value: 2
+  maximumIterationCount:
+    overrideState: 0
+    value: 16
+  resolution:
+    overrideState: 0
+    value: 0
+  thickness:
+    overrideState: 0
+    value: 8
+  maximumMarchDistance:
+    overrideState: 0
+    value: 100
+  distanceFade:
+    overrideState: 0
+    value: 0.5
+  vignette:
+    overrideState: 0
+    value: 0.5
