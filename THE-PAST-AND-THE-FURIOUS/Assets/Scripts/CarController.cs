@@ -8,7 +8,7 @@ public class CarController : MonoBehaviour
     public float acceleration = 30f;
     public float maxForwardSpeed = 25f;
     public float maxReverseSpeed = 10f;
-    public float turnSpeed = 80f;
+    public float turnSpeed = 170f;
     public float deceleration = 10f;
 
     public Vector2 moveInput;
@@ -19,7 +19,7 @@ public class CarController : MonoBehaviour
     public float turboCooldown = 5f;
 
     [Header("Stability")]
-    public float sidewaysDrag = 0.8f;
+    public float sidewaysDrag = 0.2f;
     public Vector3 centerOfMassOffset = new Vector3(0f, -0.5f, 0f);
 
     [Header("Rigidbody References")]
@@ -31,10 +31,10 @@ public class CarController : MonoBehaviour
     private float speedMultiplier = 1f;
 
     [Header("Drift")]
-    public float driftGrip = 0.2f;
-    public float driftTurnMultiplier = 3f;
-    public float driftEntryKick = 9f;
-    public float driftBoostPerSecond = 0.15f;
+    public float driftGrip = 0.12f;
+    public float driftTurnMultiplier = 1.2f;
+    public float driftEntryKick = 5f;
+    public float driftBoostPerSecond = 0.18f;
     public float driftBoostMax = 1.5f;
     public float driftBoostForce = 20f;
 
@@ -47,8 +47,11 @@ public class CarController : MonoBehaviour
     [Header("Ground Stick")]
     public LayerMask groundMask;
     public float groundCheckDistance = 0.8f;
-    public float groundStickForce = 40f;
-    public float maxUpVelocityWhenGrounded = -2f;
+    // Lighter than before — heavy stick force was stacking with gravity to ~70 m/s² of constant
+    // downforce, which made the rigid sphere wheels chatter against the ground every fixed step.
+    public float groundStickForce = 18f;
+    // Only clamps when y-velocity is high enough to be a launch — normal ramp climb stays under this.
+    public float maxUpVelocityWhenGrounded = 3f;
 
     void Awake()
     {
@@ -57,15 +60,37 @@ public class CarController : MonoBehaviour
 
         rb.mass = 120f;
         rb.linearDamping = 0f;
-        rb.angularDamping = 2f;
+        rb.angularDamping = 5f;
 
-        rb.constraints = RigidbodyConstraints.None;
-        /* rb.constraints = RigidbodyConstraints.FreezeRotationX |
-                         RigidbodyConstraints.FreezeRotationZ |
-                         RigidbodyConstraints.FreezeRotationY; */
+        // Only freeze Y rotation (yaw is driven by MoveRotation, which bypasses the constraint
+        // anyway). X/Z stay free so the body naturally pitches/rolls to follow ramp slopes.
+        // Conflict-resolution note: main branch had switched this to RigidbodyConstraints.None,
+        // but with the new physics (sphere wheels, slope assist, AI pass-through) we need the
+        // Y-axis constrained or the car spins from glancing contacts and physics torque.
+        rb.constraints = RigidbodyConstraints.FreezeRotationY;
 
         rb.centerOfMass = centerOfMassOffset;
         rb.useGravity = true;
+
+        // If groundMask was left empty in the inspector, fall back to "everything except this car's layer".
+        // Otherwise IsGrounded silently returns false forever and the down-stick / Y-clamp never apply.
+        if (groundMask.value == 0)
+            groundMask = ~(1 << gameObject.layer);
+    }
+
+    void LateUpdate()
+    {
+        // Safety net only — normal slope tilt (pitch up a ramp, roll on a banked turn) is left alone.
+        // This kicks in only on extreme tilts that mean the car got flipped by terrain jank
+        // (the "rotates to face up" bug). 60 degrees is well past anything you'd hit on a real ramp.
+        Vector3 e = transform.eulerAngles;
+        float xTilt = e.x > 180f ? e.x - 360f : e.x;
+        float zTilt = e.z > 180f ? e.z - 360f : e.z;
+        if (Mathf.Abs(xTilt) > 60f || Mathf.Abs(zTilt) > 60f)
+        {
+            transform.rotation = Quaternion.Euler(0f, e.y, 0f);
+            if (rb != null) rb.angularVelocity = Vector3.zero;
+        }
     }
 
     void Update()
@@ -96,11 +121,43 @@ public class CarController : MonoBehaviour
     {
         rb.AddForce(Physics.gravity * 2f * rb.mass, ForceMode.Force);
 
-        Vector3 forward = transform.forward;
-        forward.y = 0f;
+        // Don't drive (or even update drift state) until the GO signal. AICarController already
+        // gates on this — without the same gate here, Map 2/3 can let the player roll forward
+        // before the countdown finishes if their CountdownUI's playerInput reference is unwired.
+        if (!CountdownUI.RaceStarted)
+        {
+            moveInput = Vector2.zero;
+            return;
+        }
+
+        // One raycast per fixed step — used for slope-aligned forward, airborne check, and ground stick.
+        bool grounded = IsGrounded(out RaycastHit groundHit);
+        Vector3 surfaceNormal = grounded ? groundHit.normal : Vector3.up;
+
+        // SLOPE ASSIST: cancel the slope-tangent component of gravity when grounded. Without
+        // this, even small terrain irregularities + the 3x effective gravity can create enough
+        // tangent drag at low speed to halt the car partway up a ramp. With it, slope angle
+        // doesn't degrade propulsion — feels like flat-ground driving on any incline.
+        if (grounded)
+        {
+            Vector3 totalGravity = Physics.gravity * 3f;
+            Vector3 gravityAlongSlope = Vector3.ProjectOnPlane(totalGravity, surfaceNormal);
+            rb.AddForce(-gravityAlongSlope, ForceMode.Acceleration);
+        }
+
+        // Drive direction follows the surface plane so propulsion stays aligned with ramps
+        // instead of being projected onto the world horizontal (which made the car stall on inclines).
+        Vector3 forward = Vector3.ProjectOnPlane(transform.forward, surfaceNormal);
+        if (forward.sqrMagnitude < 0.0001f)
+        {
+            forward = transform.forward;
+            forward.y = 0f;
+        }
         forward.Normalize();
 
-        Vector3 flatVel = Vector3.ProjectOnPlane(rb.linearVelocity, Vector3.up);
+        // Velocity projected onto the same plane as `forward`, so the propulsion delta lives
+        // entirely in the drive plane (slope plane when grounded, world horizontal in air).
+        Vector3 flatVel = Vector3.ProjectOnPlane(rb.linearVelocity, surfaceNormal);
         float speed = flatVel.magnitude;
 
         // =====================
@@ -163,7 +220,7 @@ public class CarController : MonoBehaviour
         float targetSpeed = moveInput.y * maxForwardSpeed * speedMultiplier;
         if (targetSpeed < 0f) targetSpeed = Mathf.Max(targetSpeed, -maxReverseSpeed * speedMultiplier);
 
-        bool airborneCoasting = !IsGrounded(out RaycastHit hit) && Mathf.Abs(moveInput.y) < 0.01f;
+        bool airborneCoasting = !grounded && Mathf.Abs(moveInput.y) < 0.01f;
 
         if (!airborneCoasting)
         {
@@ -188,22 +245,37 @@ public class CarController : MonoBehaviour
             }
         }
 
-        // --- SIDEWAYS DRAG ---
-        // This is where the magic happens:
-        // Normal: high drag (0.8) = car goes where it faces
-        // Drift: low drag (0.35) = car slides, momentum carries sideways
-        // Release: drag slowly returns, so the slide carries and gradually settles
+        // --- SIDEWAYS DRAG (speed-preserving) ---
+        // Zeroing localVel.x while leaving the rest alone makes the car shed total speed every
+        // turn — at a 30° angle, that's ~13% magnitude loss per redirect. We instead reduce
+        // the lateral component and rescale the velocity to its original magnitude, so turning
+        // REDIRECTS speed into forward instead of bleeding it. Drift mode (high grip lerp toward
+        // driftGrip) reduces the rescale aggression so a slide still feels like a slide.
         float grip = Mathf.Lerp(sidewaysDrag, driftGrip, driftAmount);
         Vector3 localVel = transform.InverseTransformDirection(rb.linearVelocity);
+        float originalMag = localVel.magnitude;
         localVel.x *= grip;
+        // Rescale to preserve total speed — but only when not deeply drifting (so big slides
+        // don't get magic-rescaled into infinite forward speed).
+        if (originalMag > 0.1f && driftAmount < 0.5f)
+        {
+            float newMag = localVel.magnitude;
+            if (newMag > 0.001f) localVel *= (originalMag / newMag);
+        }
         rb.linearVelocity = transform.TransformDirection(localVel);
 
         // --- GROUND STICK ---
-        if (IsGrounded(out _))
+        if (grounded)
         {
-            rb.AddForce(Vector3.down * groundStickForce, ForceMode.Acceleration);
+            // Push along the surface normal (not straight down) so on a ramp the stick force
+            // doesn't fight propulsion up the slope.
+            rb.AddForce(-surfaceNormal * groundStickForce, ForceMode.Acceleration);
 
-            if (rb.linearVelocity.y > maxUpVelocityWhenGrounded)
+            // Clamp upward Y velocity on flat ground OR small bumps. Threshold of 0.88 ≈ 28° of
+            // surface tilt, which catches the kind of small bump that tips a sphere wheel into a
+            // launch but stays out of the way for real ramps (35°+).
+            bool flatishGround = Vector3.Dot(surfaceNormal, Vector3.up) > 0.88f;
+            if (flatishGround && rb.linearVelocity.y > maxUpVelocityWhenGrounded)
             {
                 Vector3 v = rb.linearVelocity;
                 v.y = maxUpVelocityWhenGrounded;

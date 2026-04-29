@@ -45,14 +45,14 @@ public class AIRaceGridSpawner : MonoBehaviour
     [Tooltip("If true and the player has a CarController, AI max speed is derived from CarController.maxForwardSpeed so the AI can keep up with the player automatically.")]
     public bool matchPlayerMaxSpeed = true;
 
-    [Tooltip("Multiplier applied when matching the player's max speed. Player gets turbo (2x) and drift boost (up to 1.5x) stacked, so the AI needs a headroom factor here just to keep up. 1.5-2.0 is usually fair.")]
-    [Range(0.5f, 3f)] public float playerSpeedMatchFactor = 1.8f;
+    [Tooltip("Multiplier applied when matching the player's max speed. Player gets turbo (2x) and drift boost (up to 1.5x) stacked, so the AI needs a headroom factor here just to keep up. 1.2-1.4 keeps them competitive without making them faster than the player at base speed.")]
+    [Range(0.5f, 3f)] public float playerSpeedMatchFactor = 1.5f;
 
     [Tooltip("Fallback max speed if there's no player CarController to read from.")]
     public float aiMaxSpeed = 25f;
 
-    public float aiSeparationDistance = 4f;
-    public float aiSeparationStrength = 25f;
+    public float aiSeparationDistance = 7f;
+    public float aiSeparationStrength = 30f;
 
     [Header("AI Personality Variance (per-racer randomization)")]
     [Tooltip("Each AI's max speed is randomized within ±(this fraction). 0.08 = ±8%.")]
@@ -72,6 +72,23 @@ public class AIRaceGridSpawner : MonoBehaviour
 
     [Tooltip("Per-AI reaction delay range after the countdown ends. Small values (0-0.4s) look natural.")]
     public Vector2 reactionDelayRange = new Vector2(0f, 0.35f);
+
+    [Header("AI Color Randomization")]
+    [Tooltip("If true, each spawned AI gets a random color from the palette below applied to its body materials.")]
+    public bool randomizeAIColors = true;
+
+    [Tooltip("Palette of body colors picked from for each AI. Add/remove entries to taste.")]
+    public Color[] aiColorPalette = new Color[]
+    {
+        new Color(0.85f, 0.15f, 0.15f), // red
+        new Color(0.15f, 0.4f, 0.85f),  // blue
+        new Color(0.15f, 0.65f, 0.25f), // green
+        new Color(0.95f, 0.7f, 0.15f),  // yellow
+        new Color(0.95f, 0.45f, 0.1f),  // orange
+        new Color(0.55f, 0.2f, 0.7f),   // purple
+        new Color(0.92f, 0.92f, 0.95f), // off-white
+        new Color(0.12f, 0.12f, 0.14f), // near-black
+    };
 
     [Header("Race Settings (forwarded to each spawned AI)")]
     public RaceManager.RaceType raceType = RaceManager.RaceType.Laps;
@@ -157,6 +174,11 @@ public class AIRaceGridSpawner : MonoBehaviour
                 // Only after activation are renderer bounds populated. Now snap the AI so its
                 // visible wheels/chassis rest on the ground directly below the spawn point.
                 PlaceAIOnGround(ai);
+
+                if (randomizeAIColors)
+                    ApplyRandomColor(ai);
+
+                IgnorePhysicalCollisionWithPlayer(ai);
 
                 if (logSpawns)
                 {
@@ -307,6 +329,60 @@ public class AIRaceGridSpawner : MonoBehaviour
         // offset = transform.y - groundY. That keeps the wheels-on-ground invariant as the AI
         // drives over terrain of varying height.
         ctrl.groundYOffset = p.y - groundY;
+    }
+
+    /// <summary>
+    /// Disable physical collision between this AI's colliders and the player car's colliders.
+    /// Without this, the kinematic AI body shoves the dynamic player rigidbody on every overlap,
+    /// and PhysX often resolves it by ejecting the player vertically (the "fly into the air on
+    /// bump" bug). Soft pushback is still applied via AICarController.PushPlayerIfClose.
+    /// </summary>
+    void IgnorePhysicalCollisionWithPlayer(GameObject ai)
+    {
+        if (playerTransform == null) return;
+
+        Transform playerRoot = playerTransform;
+        // Walk up to the rigidbody-bearing root if playerTransform is a child reference.
+        Rigidbody prb = playerTransform.GetComponentInParent<Rigidbody>();
+        if (prb != null) playerRoot = prb.transform;
+
+        Collider[] playerColliders = playerRoot.GetComponentsInChildren<Collider>(includeInactive: true);
+        Collider[] aiColliders = ai.GetComponentsInChildren<Collider>(includeInactive: true);
+
+        foreach (Collider ac in aiColliders)
+        {
+            if (ac == null || ac.isTrigger) continue;
+            foreach (Collider pc in playerColliders)
+            {
+                if (pc == null || pc.isTrigger) continue;
+                Physics.IgnoreCollision(ac, pc, true);
+            }
+        }
+    }
+
+    void ApplyRandomColor(GameObject ai)
+    {
+        if (aiColorPalette == null || aiColorPalette.Length == 0) return;
+
+        Color color = aiColorPalette[Random.Range(0, aiColorPalette.Length)];
+
+        // Skip renderers that look like wheels/tires/rims so they keep their original look.
+        MaterialPropertyBlock block = new MaterialPropertyBlock();
+        foreach (var r in ai.GetComponentsInChildren<MeshRenderer>(true))
+        {
+            if (r == null) continue;
+            string n = r.transform.name.ToLower();
+            string parentN = r.transform.parent != null ? r.transform.parent.name.ToLower() : "";
+            if (n.Contains("wheel") || n.Contains("tire") || n.Contains("rim") ||
+                parentN.Contains("wheel") || parentN.Contains("tire") || parentN.Contains("rim"))
+                continue;
+
+            r.GetPropertyBlock(block);
+            // _BaseColor is URP, _Color is built-in — set both so we don't depend on the active pipeline.
+            block.SetColor("_BaseColor", color);
+            block.SetColor("_Color", color);
+            r.SetPropertyBlock(block);
+        }
     }
 
     static Bounds? ComputeVisualBounds(GameObject root)
