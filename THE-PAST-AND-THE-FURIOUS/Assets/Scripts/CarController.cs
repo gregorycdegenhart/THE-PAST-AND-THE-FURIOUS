@@ -64,6 +64,9 @@ public class CarController : MonoBehaviour
 
         // Only freeze Y rotation (yaw is driven by MoveRotation, which bypasses the constraint
         // anyway). X/Z stay free so the body naturally pitches/rolls to follow ramp slopes.
+        // Conflict-resolution note: main branch had switched this to RigidbodyConstraints.None,
+        // but with the new physics (sphere wheels, slope assist, AI pass-through) we need the
+        // Y-axis constrained or the car spins from glancing contacts and physics torque.
         rb.constraints = RigidbodyConstraints.FreezeRotationY;
 
         rb.centerOfMass = centerOfMassOffset;

@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -9087325675190161532, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ad3225e2606caf248bdfb37406326690, type: 2}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalScale.x
       value: 133.32144
@@ -22,43 +26,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1398.1
+      value: 1398.1368
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 99
+      value: 99.00496
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1936.6
+      value: -1936.6067
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.00000035762784
+      value: 0.00015779119
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: -0.0019708385
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0.999998
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0.0003794484
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -0.044
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 179.982
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: -0.226
       objectReference: {fileID: 0}
     - target: {fileID: -7622001976314266212, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -72,6 +76,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Highway_ArchwaySigns
       objectReference: {fileID: 0}
+    - target: {fileID: 4099129203860556060, guid: 5b8c100e0c53156469e492a2ec3f5cee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: bda6904c7cddae74b87f49b06cb2d455, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

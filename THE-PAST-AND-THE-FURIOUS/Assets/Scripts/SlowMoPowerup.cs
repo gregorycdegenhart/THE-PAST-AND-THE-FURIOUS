@@ -3,60 +3,88 @@ using UnityEngine;
 
 public class SlowMoPowerup : MonoBehaviour
 {
+    [Header("Slow Motion Settings")]
     public float slowMultiplier = 0.3f;
     public float duration = 3f;
 
     private bool active = false;
+    private Collider triggerCollider;
+
+    private void Awake()
+    {
+        triggerCollider = GetComponent<Collider>();
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player") && !other.CompareTag("Opponent"))
             return;
 
-        if (active) return;
+        if (active)
+            return;
+
         active = true;
 
         GameObject picker = other.attachedRigidbody != null
             ? other.attachedRigidbody.gameObject
             : other.gameObject;
 
-        StartCoroutine(ApplySlowMo(picker));
+        if (triggerCollider != null)
+            triggerCollider.enabled = false;
 
-        gameObject.SetActive(false);
+        StartCoroutine(ApplySlowMo(picker));
     }
 
-    IEnumerator ApplySlowMo(GameObject picker)
+    private IEnumerator ApplySlowMo(GameObject picker)
     {
-        // Slow EVERY car except the picker (player + AI). The picker's tag is
-        // "Player" or "Opponent"; the AI cars are spawned as "Untagged" by the
-        // grid spawner, so we sweep every active controller of each kind.
-        var players = Object.FindObjectsByType<CarController>(FindObjectsSortMode.None);
-        var aiCars = Object.FindObjectsByType<AICarController>(FindObjectsSortMode.None);
+        CarController[] players =
+            Object.FindObjectsByType<CarController>(FindObjectsSortMode.None);
 
-        foreach (var car in players)
+        AICarController[] aiCars =
+            Object.FindObjectsByType<AICarController>(FindObjectsSortMode.None);
+
+        float endTime = Time.realtimeSinceStartup + duration;
+
+        // Keep forcing the slow effect for the full duration
+        while (Time.realtimeSinceStartup < endTime)
         {
-            if (car == null || car.gameObject == picker) continue;
-            car.SetSpeedMultiplier(slowMultiplier);
+            foreach (CarController car in players)
+            {
+                if (car == null || car.gameObject == picker)
+                    continue;
+
+                car.SetSpeedMultiplier(slowMultiplier);
+            }
+
+            foreach (AICarController ai in aiCars)
+            {
+                if (ai == null || ai.gameObject == picker)
+                    continue;
+
+                ai.SetSpeedMultiplier(slowMultiplier);
+            }
+
+            yield return null;
         }
 
-        foreach (var ai in aiCars)
+        // Restore everyone except the picker
+        foreach (CarController car in players)
         {
-            if (ai == null || ai.gameObject == picker) continue;
-            ai.SetSpeedMultiplier(slowMultiplier);
-        }
+            if (car == null || car.gameObject == picker)
+                continue;
 
-        yield return new WaitForSeconds(duration);
-
-        foreach (var car in players)
-        {
-            if (car == null || car.gameObject == picker) continue;
             car.SetSpeedMultiplier(1f);
         }
 
-        foreach (var ai in aiCars)
+        foreach (AICarController ai in aiCars)
         {
-            if (ai == null || ai.gameObject == picker) continue;
+            if (ai == null || ai.gameObject == picker)
+                continue;
+
             ai.SetSpeedMultiplier(1f);
         }
+
+        // Now it is safe to deactivate the powerup
+        gameObject.SetActive(false);
     }
 }
