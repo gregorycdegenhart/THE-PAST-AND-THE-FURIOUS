@@ -18,22 +18,22 @@ public class AICarController : MonoBehaviour
 
     [Header("Braking")]
     [Tooltip("How many waypoints ahead to scan for corners. Scales with speed automatically.")]
-    public int lookAheadCount = 6;
+    public int lookAheadCount = 8;
     [Tooltip("Total angle across lookahead waypoints that counts as a mild corner (starts gentle braking).")]
-    public float gentleCornerAngle = 20f;
+    public float gentleCornerAngle = 12f;
     [Tooltip("Total angle across lookahead waypoints that counts as a hairpin (full braking).")]
-    public float hairpinCornerAngle = 90f;
+    public float hairpinCornerAngle = 80f;
     [Tooltip("Speed multiplier for a gentle corner.")]
-    [Range(0.3f, 1f)] public float cornerSpeedMultiplier = 0.8f;
+    [Range(0.3f, 1f)] public float cornerSpeedMultiplier = 0.85f;
     [Tooltip("Speed multiplier for a hairpin — AI cannot go faster than this through the tightest turns.")]
-    [Range(0.1f, 0.9f)] public float hairpinSpeedMultiplier = 0.55f;
+    [Range(0.1f, 0.9f)] public float hairpinSpeedMultiplier = 0.6f;
 
     [Header("Rubber Banding")]
     public Transform playerTransform;
     public float rubberBandSlowDistance = 30f;
     public float rubberBandFastDistance = 15f;
     public float rubberBandSlowMultiplier = 0.9f;
-    public float rubberBandFastMultiplier = 1.8f;
+    public float rubberBandFastMultiplier = 1.5f;
 
     [Header("Imperfect Steering")]
     public float steerNoiseAmount = 0.08f;
@@ -44,13 +44,18 @@ public class AICarController : MonoBehaviour
     public float racingLineRandomRange = 4f;
 
     [Header("Car Separation")]
-    public float separationDistance = 4f;
-    public float separationStrength = 25f;
+    public float separationDistance = 12f;
+    public float separationStrength = 35f;
+
+    [Tooltip("Multiplier on the lateral (sideways) component of the separation push. >1 spreads cars across the road instead of stacking on the racing line. ~2.5 keeps them in distinct lanes.")]
+    public float lateralSeparationBias = 2.5f;
 
     [Header("Player Pushback")]
+    [Tooltip("If true, the AI applies a soft impulse to the player when too close. Set false (default) to let the player phase through cleanly with no interaction.")]
+    public bool applyPlayerPushback = false;
     public Rigidbody playerRigidbody;
     public float pushDistance = 3f;
-    public float pushForce = 12f;
+    public float pushForce = 6f;
 
     [Header("Turbo")]
     public float turboSpeedMultiplier = 2f;
@@ -101,6 +106,16 @@ public class AICarController : MonoBehaviour
     private int currentWaypointIndex = 0;
     private int currentLap = 1;
     private bool raceFinished = false;
+
+    // Stuck recovery: tracks how long the AI has been making basically no forward progress.
+    // After STUCK_TIMEOUT, force-advance the waypoint and disable obstacle blocking briefly so
+    // the AI can phase past whatever it caught on (geometry, another AI, the player).
+    private Vector3 lastProgressPosition;
+    private float stuckTimer = 0f;
+    private float panicRecoveryEndTime = -1f;
+    private const float STUCK_TIMEOUT = 1.5f;
+    private const float PANIC_RECOVERY_DURATION = 1.8f;
+    private const float STUCK_MIN_DISTANCE_PER_SECOND = 1.0f;
 
     private bool isTurboActive = false;
     private float turboTimer = 0f;
@@ -208,20 +223,32 @@ public class AICarController : MonoBehaviour
         }
         targetSpeed *= cornerBrake;
 
-        targetSpeed *= GetRubberBandMultiplier();
+        float rubber = GetRubberBandMultiplier();
+        targetSpeed *= rubber;
         targetSpeed *= externalSpeedMultiplier;
 
-        // Don't fire a new turbo while steering through a real corner — the extra speed
-        // is exactly what sends the AI off the track. Finish the turn first.
-        bool inCorner = cornerSeverity > gentleCornerAngle;
+        // Don't fire a new turbo while steering through a HAIRPIN — gentle corners are fine.
+        // (gentleCornerAngle is now low enough that almost every stretch of track counts as a
+        // "corner" for braking purposes, which would lock the AI out of turbo entirely.)
+        bool inHairpinForTurbo = cornerSeverity > Mathf.Max(40f, hairpinCornerAngle * 0.6f);
+
+        // Don't fire turbo when already heavily rubber-banding — without this, an AI that fell
+        // behind catches up at base * 2.0 (rubber band) * 2.0 (turbo) = 4x speed, which feels
+        // like a supersonic last-second pass at the finish line.
+        bool alreadyBoosted = rubber > 1.3f;
 
         if (isTurboActive)
             targetSpeed *= turboSpeedMultiplier;
-        else if (cooldownTimer <= 0f && !inCorner)
+        else if (cooldownTimer <= 0f && !inHairpinForTurbo && !alreadyBoosted)
         {
             isTurboActive = true;
             turboTimer = turboDuration;
         }
+
+        // Hard cap so no combination of boosts (rubber band, turbo, drift kick, slow-mo inverse)
+        // ever pushes the AI past 2.5x their base maxSpeed. Belt-and-suspenders against
+        // multiplicative stacking I might add later.
+        targetSpeed = Mathf.Min(targetSpeed, maxSpeed * 2.5f);
 
         // --- Smooth acceleration ---
         currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, (maxSpeed / accelerationTime) * Time.fixedDeltaTime);
@@ -241,10 +268,14 @@ public class AICarController : MonoBehaviour
         // Obstacle avoidance: AI is kinematic so Unity won't resolve collisions with terrain,
         // walls, or other AI. Sweep-test the intended move and clamp distance if anything
         // blocks the path. Hard-separates AI-vs-AI as a safety net over the soft separation.
-        if (blockAgainstSolids)
+        // Skipped during panic recovery so the AI can phase past whatever it got stuck on.
+        bool inPanic = Time.time < panicRecoveryEndTime;
+        if (blockAgainstSolids && !inPanic)
             ClampAgainstObstacles(ref newPos);
 
         rb.MovePosition(newPos);
+
+        UpdateStuckRecovery(newPos);
 
         PushPlayerIfClose();
 
@@ -253,6 +284,43 @@ public class AICarController : MonoBehaviour
         bool passedBy = advanceOnPassBy && HasPassedCurrentWaypoint(targetWaypoint);
         if (reached || passedBy)
             AdvanceWaypoint();
+    }
+
+    /// <summary>
+    /// Tracks forward progress and triggers panic recovery if the AI has been stuck. Recovery
+    /// = force-advance the waypoint and skip obstacle blocking for ~2 seconds so the AI can
+    /// phase past whatever caught it (wall corner, another AI, the player, etc.).
+    /// </summary>
+    private void UpdateStuckRecovery(Vector3 currentPos)
+    {
+        if (Time.time < panicRecoveryEndTime) return; // already recovering
+
+        if (lastProgressPosition == Vector3.zero)
+        {
+            lastProgressPosition = currentPos;
+            return;
+        }
+
+        Vector3 delta = currentPos - lastProgressPosition;
+        delta.y = 0f;
+        float distMoved = delta.magnitude;
+        float requiredPerStep = STUCK_MIN_DISTANCE_PER_SECOND * Time.fixedDeltaTime;
+
+        if (distMoved < requiredPerStep)
+        {
+            stuckTimer += Time.fixedDeltaTime;
+            if (stuckTimer >= STUCK_TIMEOUT)
+            {
+                panicRecoveryEndTime = Time.time + PANIC_RECOVERY_DURATION;
+                stuckTimer = 0f;
+                AdvanceWaypoint();
+            }
+        }
+        else
+        {
+            stuckTimer = 0f;
+        }
+        lastProgressPosition = currentPos;
     }
 
     /// <summary>
@@ -389,6 +457,13 @@ public class AICarController : MonoBehaviour
             // Skip our own colliders.
             if (h.collider.transform == transform || h.collider.transform.IsChildOf(transform)) continue;
 
+            // Skip the player. Hard-clamping against the player car puts the kinematic AI in
+            // constant overlap with the non-kinematic player rigidbody, which PhysX resolves by
+            // ejecting the player every frame — feels like the player gets "stuck" on the AI.
+            // Leave player handling to PushPlayerIfClose (a soft impulse) and to PhysX's natural
+            // kinematic-vs-dynamic contact response.
+            if (h.collider.attachedRigidbody != null && h.collider.attachedRigidbody.GetComponent<CarController>() != null) continue;
+
             // BoxCast reports 0 distance when a collider is already overlapping at start; ignore those.
             if (h.distance <= 0f) continue;
 
@@ -445,6 +520,10 @@ public class AICarController : MonoBehaviour
                 if (h.collider.transform == selfRoot) continue;
                 if (h.collider.transform.IsChildOf(selfRoot)) continue;
             }
+            // Skip anything attached to a Rigidbody — that's the player or another AI car.
+            // Without this filter the ground-snap raycast can land on another car's roof and
+            // teleport this AI vertically up onto it.
+            if (h.collider.attachedRigidbody != null) continue;
             if (h.distance < nearestDist)
             {
                 nearestDist = h.distance;
@@ -460,6 +539,13 @@ public class AICarController : MonoBehaviour
     {
         if (allAICars == null) return proposedPos;
 
+        // Build a "right" axis perpendicular to forward in the world plane so we can decompose
+        // the push into lateral (sideways across the track) vs longitudinal (along forward).
+        Vector3 forwardFlat = transform.forward;
+        forwardFlat.y = 0f;
+        forwardFlat.Normalize();
+        Vector3 rightFlat = Vector3.Cross(Vector3.up, forwardFlat);
+
         foreach (AICarController other in allAICars)
         {
             if (other == null || other == this) continue;
@@ -470,9 +556,18 @@ public class AICarController : MonoBehaviour
 
             if (dist < separationDistance && dist > 0.001f)
             {
-                Vector3 pushDir = toOther.normalized;
+                Vector3 pushDir = -toOther.normalized; // we push AWAY from other
+
+                // Re-weight: amplify the sideways component so cars spread across the road
+                // instead of stacking on the racing line.
+                float lateral = Vector3.Dot(pushDir, rightFlat);
+                float longitudinal = Vector3.Dot(pushDir, forwardFlat);
+                Vector3 weightedDir = (rightFlat * lateral * lateralSeparationBias) + (forwardFlat * longitudinal);
+                if (weightedDir.sqrMagnitude > 0.0001f) weightedDir.Normalize();
+                else weightedDir = pushDir;
+
                 float overlap = separationDistance - dist;
-                proposedPos -= pushDir * overlap * separationStrength * Time.fixedDeltaTime;
+                proposedPos += weightedDir * overlap * separationStrength * Time.fixedDeltaTime;
                 proposedPos.y = rb.position.y;
             }
         }
@@ -482,6 +577,7 @@ public class AICarController : MonoBehaviour
 
     private void PushPlayerIfClose()
     {
+        if (!applyPlayerPushback) return;
         if (playerRigidbody == null) return;
 
         Vector3 toPlayer = playerRigidbody.position - rb.position;
@@ -537,7 +633,14 @@ public class AICarController : MonoBehaviour
             return rubberBandSlowMultiplier;
 
         if (waypointDiff < -2 || (waypointDiff <= 0 && distToPlayer > rubberBandFastDistance))
-            return rubberBandFastMultiplier;
+        {
+            // Scale the boost with how far behind. Base multiplier at -2, then add 0.05 per
+            // additional waypoint behind, capped at 2.0. Without scaling, an AI 12 waypoints
+            // back has the same boost as one 2 waypoints back and just camps the back of the pack.
+            int waypointsBehind = Mathf.Max(0, -waypointDiff - 2);
+            float boost = rubberBandFastMultiplier + waypointsBehind * 0.05f;
+            return Mathf.Min(boost, 2.0f);
+        }
 
         return 1f;
     }
@@ -603,6 +706,10 @@ public class AICarController : MonoBehaviour
 
     public bool IsTurboActive() => isTurboActive;
     public float GetCooldownProgress() => cooldownTimer > 0f ? cooldownTimer / turboCooldown : 0f;
+
+    public int CurrentLap => currentLap;
+    public int CurrentWaypointIndex => currentWaypointIndex;
+    public bool RaceFinished => raceFinished;
 
     // Mirrors CarController.SetSpeedMultiplier so power-ups (slow-mo, future buffs)
     // can affect AI the same way they affect the player.

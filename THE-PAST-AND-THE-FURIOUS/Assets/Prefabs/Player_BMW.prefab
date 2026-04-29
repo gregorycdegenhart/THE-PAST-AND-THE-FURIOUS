@@ -280,27 +280,27 @@ MonoBehaviour:
   acceleration: 20
   maxForwardSpeed: 25
   maxReverseSpeed: 10
-  turnSpeed: 80
+  turnSpeed: 170
   deceleration: 10
   moveInput: {x: 0, y: 0}
   turboSpeedMultiplier: 2
   turboDuration: 2
   turboCooldown: 5
-  sidewaysDrag: 0.8
+  sidewaysDrag: 0.2
   centerOfMassOffset: {x: 0, y: -0.5, z: 0}
   rb: {fileID: 0}
-  driftGrip: 0.2
-  driftTurnMultiplier: 3
-  driftEntryKick: 9
-  driftBoostPerSecond: 0.15
+  driftGrip: 0.12
+  driftTurnMultiplier: 1.2
+  driftEntryKick: 5
+  driftBoostPerSecond: 0.18
   driftBoostMax: 1.5
   driftBoostForce: 20
   groundMask:
     serializedVersion: 2
     m_Bits: 0
   groundCheckDistance: 0.8
-  groundStickForce: 40
-  maxUpVelocityWhenGrounded: -2
+  groundStickForce: 18
+  maxUpVelocityWhenGrounded: 3
 --- !u!136 &6156303139612931602
 CapsuleCollider:
   m_ObjectHideFlags: 0

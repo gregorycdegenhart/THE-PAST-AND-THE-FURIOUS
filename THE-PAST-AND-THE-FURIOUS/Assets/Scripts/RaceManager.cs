@@ -80,6 +80,7 @@ public class RaceManager : MonoBehaviour
     public int GetVisitedCount() => visitedCheckpoints.Count;
     public int GetAIFinishCount() => aiFinishCount;
     public int GetPlayerPosition() => aiFinishCount + 1; // 1-based; called when the player crosses the line
+    public int CurrentLap => currentLap;
 
     /// <summary>
     /// Each AI calls this when it crosses the finish line. Used to compute the player's
@@ -199,6 +200,9 @@ public class RaceManager : MonoBehaviour
                 gameOverScreen.ShowGameOver($"You finished {pos}{suffix}");
             yield break;
         }
+
+        // Persist the player's finishing position so the WinScene can show it on the podium.
+        PlayerPrefs.SetInt("FinalPosition", aiFinishCount + 1);
 
         // Win path: fade to black, then load the next scene.
         if (fadeGroup != null)
