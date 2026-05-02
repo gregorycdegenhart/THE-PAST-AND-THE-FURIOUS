@@ -151,7 +151,6 @@ public class GarageManager : MonoBehaviour
     public void NextCar()
     {
         selectedCarIndex = (selectedCarIndex + 1) % cars.Length;
-        Debug.Log($"[GarageManager] NextCar -> index={selectedCarIndex} name={cars[selectedCarIndex].carName} map={cars[selectedCarIndex].mapSceneName}");
         OnCarChanged();
     }
 
@@ -159,7 +158,6 @@ public class GarageManager : MonoBehaviour
     {
         selectedCarIndex--;
         if (selectedCarIndex < 0) selectedCarIndex = cars.Length - 1;
-        Debug.Log($"[GarageManager] PreviousCar -> index={selectedCarIndex} name={cars[selectedCarIndex].carName} map={cars[selectedCarIndex].mapSceneName}");
         OnCarChanged();
     }
 
@@ -206,10 +204,6 @@ public class GarageManager : MonoBehaviour
             Debug.LogError($"[GarageManager] cars[{selectedCarIndex}] ({car.carName}) has no mapSceneName set in the inspector.");
             return;
         }
-
-        // If the loaded scene doesn't match the displayed car, the inspector array
-        // is misaligned — the map field of cars[N] is not the map you intended.
-        Debug.Log($"[GarageManager] ConfirmAndRace -> index={selectedCarIndex} car={car.carName} loading scene='{car.mapSceneName}'");
 
         PlayerPrefs.SetInt("SelectedCar", selectedCarIndex);
         PlayerPrefs.SetInt("SelectedDriver", selectedDriverIndex);

@@ -68,10 +68,7 @@ public class WinScreenUI : MonoBehaviour
             {
                 Button btn = t.GetComponent<Button>();
                 if (btn != null && btn.onClick.GetPersistentEventCount() == 0)
-                {
-                    btn.onClick.RemoveListener(action);
                     btn.onClick.AddListener(action);
-                }
                 return;
             }
         }
