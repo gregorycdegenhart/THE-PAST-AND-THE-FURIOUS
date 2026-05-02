@@ -83,7 +83,6 @@ public class MenuUIManager : MonoBehaviour
     // -------- QUIT --------
     public void QuitGame()
     {
-        Debug.Log("Quit Game");
         Application.Quit();
     }
 }

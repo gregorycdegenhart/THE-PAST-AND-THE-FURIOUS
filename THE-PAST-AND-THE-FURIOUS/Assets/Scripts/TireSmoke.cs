@@ -67,9 +67,6 @@ public class TireSmoke : MonoBehaviour
             }
         }
 
-        Debug.Log("TireSmoke: " + smokeParticles.Length + " emitters at " + tirePositions.Length + " wheels" +
-            (smokePrefab != null ? " (Exhaust Smoke prefab)" : " (procedural)") +
-            " | Tire names: " + string.Join(", ", System.Array.ConvertAll(tirePositions, t => t.name)));
     }
 
     void Update()

@@ -37,10 +37,8 @@ public static class MinimapBootstrap
             return;
         }
 
-        MinimapCamera mc = EnsureMinimapCamera(rt);
+        EnsureMinimapCamera(rt);
         EnsureMinimapUI(rt);
-
-        Debug.Log($"[MinimapBootstrap] Wired minimap on '{scene.name}'. Camera target={(mc != null && mc.target != null ? mc.target.name : "<none>")}, RT={rt.name}");
     }
 
     static MinimapCamera EnsureMinimapCamera(RenderTexture rt)
