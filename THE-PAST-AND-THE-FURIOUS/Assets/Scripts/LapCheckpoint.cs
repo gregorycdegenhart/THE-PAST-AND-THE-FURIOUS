@@ -3,7 +3,7 @@ using UnityEngine;
 public class LapCheckpoint : MonoBehaviour
 {
     public int checkpointIndex = 0;
-    public bool completesLap = false; // only matters in Laps mode
+    public bool completesLap = false;
 
     private float lastTriggerTime = -1f;
 
@@ -11,15 +11,14 @@ public class LapCheckpoint : MonoBehaviour
     {
         if (other.CompareTag("Player") && RaceManager.Instance != null)
         {
-            // Don't register checkpoints before the race starts
             if (!CountdownUI.RaceStarted) return;
 
-            // Prevent double-firing from multiple colliders on the same car
             if (Time.time - lastTriggerTime < 0.5f) return;
             lastTriggerTime = Time.time;
 
             Debug.Log($"[CP] index={checkpointIndex} completesLap={completesLap} visited={RaceManager.Instance.GetVisitedCount()}");
             RaceManager.Instance.HitCheckpoint(checkpointIndex, completesLap);
+            RespawnManager.Instance?.UpdateLastCheckpoint(transform, other.transform.root.rotation);
 
             CarAudio carAudio = other.GetComponentInParent<CarAudio>();
             if (carAudio != null) carAudio.PlayCheckpointSound();
