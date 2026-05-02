@@ -690,7 +690,6 @@ public class AICarController : MonoBehaviour
                 raceFinished = true;
                 waitingForFinalFinishCross = false;
                 if (RaceManager.Instance != null) RaceManager.Instance.RegisterAIFinish();
-                Debug.Log(gameObject.name + " finished the race (crossed WP_00)!");
             }
         }
         else if (raceType == RaceManager.RaceType.Checkpoints)
@@ -699,7 +698,6 @@ public class AICarController : MonoBehaviour
             {
                 raceFinished = true;
                 if (RaceManager.Instance != null) RaceManager.Instance.RegisterAIFinish();
-                Debug.Log(gameObject.name + " finished the race!");
             }
         }
     }

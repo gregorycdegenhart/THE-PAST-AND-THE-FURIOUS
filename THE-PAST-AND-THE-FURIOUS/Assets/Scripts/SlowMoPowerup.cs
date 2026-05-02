@@ -8,12 +8,6 @@ public class SlowMoPowerup : MonoBehaviour
     public float duration = 3f;
 
     private bool active = false;
-    private Collider triggerCollider;
-
-    private void Awake()
-    {
-        triggerCollider = GetComponent<Collider>();
-    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -29,8 +23,9 @@ public class SlowMoPowerup : MonoBehaviour
             ? other.attachedRigidbody.gameObject
             : other.gameObject;
 
-        if (triggerCollider != null)
-            triggerCollider.enabled = false;
+        Collider trigger = GetComponent<Collider>();
+        if (trigger != null)
+            trigger.enabled = false;
 
         StartCoroutine(ApplySlowMo(picker));
     }

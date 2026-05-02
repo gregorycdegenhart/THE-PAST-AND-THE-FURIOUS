@@ -137,7 +137,6 @@ public class RaceManager : MonoBehaviour
                     {
                         currentLap++;
                         UpdateLapUI();
-                        Debug.Log("Lap completed: " + currentLap);
                         visitedCheckpoints.Clear();
 
                         if (currentLap > totalLaps)
@@ -156,7 +155,6 @@ public class RaceManager : MonoBehaviour
                     return;
 
                 currentCheckpoint++;
-                Debug.Log("Checkpoint reached: " + checkpointIndex);
 
                 if (checkpointIndex == finalCheckpointIndex)
                     StartCoroutine(FinishRace());
