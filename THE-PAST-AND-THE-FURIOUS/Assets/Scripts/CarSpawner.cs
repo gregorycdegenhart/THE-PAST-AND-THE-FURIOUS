@@ -46,7 +46,10 @@ public class CarSpawner : MonoBehaviour
                     lt.enabled = false;
 
         var aiSpawner = FindFirstObjectByType<AIRaceGridSpawner>();
-        if (aiSpawner != null && aiSpawner.playerTransform == null)
-            aiSpawner.playerTransform = car.transform;
+        if (aiSpawner != null)
+        {
+            if (aiSpawner.playerTransform == null) aiSpawner.playerTransform = car.transform;
+            if (aiSpawner.playerRigidbody == null) aiSpawner.playerRigidbody = car.GetComponent<Rigidbody>() ?? car.GetComponentInChildren<Rigidbody>();
+        }
     }
 }

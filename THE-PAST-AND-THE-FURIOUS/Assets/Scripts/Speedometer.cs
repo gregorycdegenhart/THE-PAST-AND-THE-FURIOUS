@@ -11,6 +11,15 @@ public class Speedometer : MonoBehaviour
     public string displayFormat = "{0} MPH";
     public float maxDisplayMPH = 200f;
 
+    void Start()
+    {
+        if (carRigidbody == null)
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player != null) carRigidbody = player.GetComponent<Rigidbody>() ?? player.GetComponentInChildren<Rigidbody>();
+        }
+    }
+
     void Update()
     {
         if (carRigidbody == null || speedText == null) return;

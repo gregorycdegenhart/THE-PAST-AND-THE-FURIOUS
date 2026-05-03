@@ -110,6 +110,15 @@ public class TurboCooldownUI : MonoBehaviour
         return s_whiteSprite;
     }
 
+    void Start()
+    {
+        if (carController == null)
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player != null) carController = player.GetComponent<CarController>() ?? player.GetComponentInChildren<CarController>();
+        }
+    }
+
     void Update()
     {
         if (fillBar == null || carController == null) return;
