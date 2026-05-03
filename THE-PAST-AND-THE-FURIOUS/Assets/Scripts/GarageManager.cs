@@ -45,10 +45,14 @@ public class GarageManager : MonoBehaviour
     public float cameraMoveSpeed = 5f;
     
 
-    [Tooltip("Cameras to cycle between via the top arrows in the garage UI (left = previous, right = next). Only one is active at a time.")]
-    public Camera[] carCameras;
-    private int selectedCameraIndex = 0;
+    [Tooltip("Display car GameObjects shown in the garage. Top arrows cycle which one is active. Index 0 = orange (Car 1), 1 = pink (Car 2), 2 = blue (Car 3). Place all at the same world position.")]
+    public GameObject[] displayCars;
+    private int selectedDisplayCarIndex = 0;
 public float cameraRotateSpeed = 5f;
+
+    [Header("Cutscene")]
+    [Tooltip("Optional. If set, ConfirmAndRace plays the cutscene + fade before loading the map. If null, the map loads immediately.")]
+    public CutsceneManager cutsceneManager;
 
     [Header("UI")]
     public TextMeshProUGUI carNameText;
@@ -68,11 +72,14 @@ public float cameraRotateSpeed = 5f;
             garageCamera = Camera.main;
 
         // Self-wire buttons by name
-        WireButton("PrevCarButton", PreviousCar);
-        WireButton("NextCarButton", NextCar);
-        // Driver arrows now control camera (car) selection — the driver concept is unused in the garage UI.
+        // Top "SELECT CAR" arrows (named PrevDriverButton/NextDriverButton in the scene)
+        // switch which camera is active (Main vs Car2).
         WireButton("PrevDriverButton", PreviousCamera);
         WireButton("NextDriverButton", NextCamera);
+        // Bottom map arrows (named PrevCarButton/NextCarButton in the scene)
+        // cycle the car/map pairing.
+        WireButton("PrevCarButton", PreviousCar);
+        WireButton("NextCarButton", NextCar);
         WireButton("RaceButton", ConfirmAndRace);
         WireButton("BackButton", BackToMenu);
 
@@ -84,7 +91,9 @@ public float cameraRotateSpeed = 5f;
         UpdateUI();
         UpdateDisplayModels();
         SnapCameraToCurrentCar();
-        UpdateCameraSelection();
+        UpdateDisplayCarSelection();
+
+        if (cutsceneManager == null) cutsceneManager = FindFirstObjectByType<CutsceneManager>();
     }
 
     void WireButton(string name, UnityEngine.Events.UnityAction action)
@@ -97,9 +106,6 @@ public float cameraRotateSpeed = 5f;
         }
         var button = btn.GetComponent<UnityEngine.UI.Button>();
         if (button == null) return;
-        // Don't add a script listener if the Inspector already wired this button —
-        // double-listeners cause NextCar to fire twice per click and pick the wrong map.
-        if (button.onClick.GetPersistentEventCount() > 0) return;
         button.onClick.RemoveListener(action);
         button.onClick.AddListener(action);
     }
@@ -191,29 +197,29 @@ public float cameraRotateSpeed = 5f;
         MoveCameraToCurrentCar();
     }
 
-    // --- Camera Switching ---
+    // --- Display Car Switching (top arrows) ---
     public void NextCamera()
     {
-        if (carCameras == null || carCameras.Length == 0) return;
-        selectedCameraIndex = (selectedCameraIndex + 1) % carCameras.Length;
-        UpdateCameraSelection();
+        if (displayCars == null || displayCars.Length == 0) return;
+        selectedDisplayCarIndex = (selectedDisplayCarIndex + 1) % displayCars.Length;
+        UpdateDisplayCarSelection();
     }
 
     public void PreviousCamera()
     {
-        if (carCameras == null || carCameras.Length == 0) return;
-        selectedCameraIndex--;
-        if (selectedCameraIndex < 0) selectedCameraIndex = carCameras.Length - 1;
-        UpdateCameraSelection();
+        if (displayCars == null || displayCars.Length == 0) return;
+        selectedDisplayCarIndex--;
+        if (selectedDisplayCarIndex < 0) selectedDisplayCarIndex = displayCars.Length - 1;
+        UpdateDisplayCarSelection();
     }
 
-    void UpdateCameraSelection()
+    void UpdateDisplayCarSelection()
     {
-        if (carCameras == null) return;
-        for (int i = 0; i < carCameras.Length; i++)
+        if (displayCars == null) return;
+        for (int i = 0; i < displayCars.Length; i++)
         {
-            if (carCameras[i] != null)
-                carCameras[i].gameObject.SetActive(i == selectedCameraIndex);
+            if (displayCars[i] != null)
+                displayCars[i].SetActive(i == selectedDisplayCarIndex);
         }
     }
 
@@ -241,11 +247,21 @@ public float cameraRotateSpeed = 5f;
 
         PlayerPrefs.SetInt("SelectedCar", selectedCarIndex);
         PlayerPrefs.SetInt("SelectedDriver", selectedDriverIndex);
+        // Top-arrow display car index: 0 = orange (Car 1), 1 = pink (Car 2), 2 = blue (Car 3).
+        PlayerPrefs.SetInt("SelectedCarColor", selectedDisplayCarIndex);
         PlayerPrefs.SetString("SelectedCarName", car.carName);
         PlayerPrefs.SetString("SelectedDriverName", drivers[selectedDriverIndex].driverName);
         PlayerPrefs.Save();
 
-        SceneManager.LoadScene(car.mapSceneName);
+        if (cutsceneManager != null)
+        {
+            cutsceneManager.SetSelectedScene(car.mapSceneName);
+            cutsceneManager.StartCutscene();
+        }
+        else
+        {
+            SceneManager.LoadScene(car.mapSceneName);
+        }
     }
 
     public void BackToMenu()
