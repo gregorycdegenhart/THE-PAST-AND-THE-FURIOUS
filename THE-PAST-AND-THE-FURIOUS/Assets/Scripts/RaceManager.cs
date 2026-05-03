@@ -212,7 +212,10 @@ public class RaceManager : MonoBehaviour
         }
 
         // Persist the player's finishing position so the WinScene can show it on the podium.
-        PlayerPrefs.SetInt("FinalPosition", aiFinishCount + 1);
+        // Global key = latest race; per-scene key = used by the final win screen to summarize all 3 maps.
+        int finalPos = aiFinishCount + 1;
+        PlayerPrefs.SetInt("FinalPosition", finalPos);
+        PlayerPrefs.SetInt("FinalPosition_" + SceneManager.GetActiveScene().name, finalPos);
 
         // Win path: fade to black, then load the next scene.
         if (fadeGroup != null)
