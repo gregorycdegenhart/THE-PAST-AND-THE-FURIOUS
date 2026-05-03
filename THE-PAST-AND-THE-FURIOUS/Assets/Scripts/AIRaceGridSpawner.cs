@@ -119,9 +119,22 @@ public class AIRaceGridSpawner : MonoBehaviour
 
     void SpawnGrid()
     {
+        // Walk up to the player's RIGIDBODY-bearing root before reading rotation. If the
+        // playerTransform field was wired to a child of the player car (e.g., a camera
+        // anchor or wheel pivot) that has its own local rotation, reading rotation directly
+        // gives the child's world rotation — which can be offset 90° (or any angle) from
+        // the actual car heading. The Rigidbody is on the root, so finding it gives us
+        // the real car orientation.
+        Transform rotationSource = playerTransform;
+        if (playerTransform != null)
+        {
+            Rigidbody prb = playerTransform.GetComponentInParent<Rigidbody>();
+            if (prb != null) rotationSource = prb.transform;
+        }
+
         // Anchor the grid at the player's position and facing, or at this spawner if no player.
-        Vector3 anchorPos = playerTransform != null ? playerTransform.position : transform.position;
-        Quaternion anchorRot = playerTransform != null ? playerTransform.rotation : transform.rotation;
+        Vector3 anchorPos = rotationSource != null ? rotationSource.position : transform.position;
+        Quaternion anchorRot = rotationSource != null ? rotationSource.rotation : transform.rotation;
 
         Vector3 fwd = anchorRot * Vector3.forward;
         Vector3 right = anchorRot * Vector3.right;
@@ -156,35 +169,46 @@ public class AIRaceGridSpawner : MonoBehaviour
                 Vector3 spawnPos = anchorPos + fwd * rowForward + right * colLateral;
                 spawnPos.y = anchorPos.y;
 
-                // Instantiating under an inactive parent means Awake on the clone's components
-                // is deferred until we reparent and activate.
-                GameObject ai = Instantiate(carSourcePrefab, holder.transform);
-                ai.name = $"AI_Racer_{placed + 1}";
-
-                ConfigureAsAI(ai);
-
-                // Move out of the inactive holder and into world space at the intended spot.
-                ai.transform.SetParent(null, false);
-                ai.transform.position = spawnPos;
-                ai.transform.rotation = anchorRot;
-
-                // Surviving components' Awake fires here.
-                ai.SetActive(true);
-
-                // Only after activation are renderer bounds populated. Now snap the AI so its
-                // visible wheels/chassis rest on the ground directly below the spawn point.
-                PlaceAIOnGround(ai);
-
-                if (randomizeAIColors)
-                    ApplyRandomColor(ai);
-
-                IgnorePhysicalCollisionWithPlayer(ai);
-
-                if (logSpawns)
+                // Wrap each spawn in try/catch so an exception on AI #N doesn't strand the
+                // loop and prevent AI #N+1..7 from spawning. Without this guard, a single
+                // failed AI silently caps the field at however many had spawned successfully.
+                try
                 {
-                    AICarController ctrlForLog = ai.GetComponent<AICarController>();
-                    float offsetForLog = ctrlForLog != null ? ctrlForLog.groundYOffset : 0f;
-                    Debug.Log($"[AIRaceGridSpawner] Spawned {ai.name} at row={row} col={col} pos={ai.transform.position} groundYOffset={offsetForLog:F2}");
+                    GameObject ai = Instantiate(carSourcePrefab, holder.transform);
+                    ai.name = $"AI_Racer_{placed + 1}";
+
+                    ConfigureAsAI(ai);
+
+                    ai.transform.SetParent(null, false);
+                    ai.transform.position = spawnPos;
+                    ai.transform.rotation = anchorRot;
+
+                    ai.SetActive(true);
+
+                    PlaceAIOnGround(ai);
+
+                    if (randomizeAIColors)
+                        ApplyRandomColor(ai);
+
+                    IgnorePhysicalCollisionWithPlayer(ai);
+                    IgnoreCollisionWithOtherAI(ai);
+
+                    // Pin the rotation as the very last spawn step. Setting rotation earlier
+                    // (before PlaceAIOnGround / activation) can let physics or rigidbody init
+                    // nudge the rotation. We force it to match the player here on BOTH the
+                    // transform and the rigidbody so they're in sync going into the first
+                    // physics step. Yaw is then frozen by AICarController's FreezeRotationY
+                    // constraint until the AI actively steers post-countdown.
+                    ai.transform.rotation = anchorRot;
+                    Rigidbody airb = ai.GetComponent<Rigidbody>();
+                    if (airb != null) airb.rotation = anchorRot;
+
+                    if (logSpawns)
+                        Debug.Log($"[AIRaceGridSpawner] Spawned {ai.name} at row={row} col={col} pos={ai.transform.position}");
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"[AIRaceGridSpawner] Failed to spawn AI #{placed + 1} at row={row} col={col}: {ex.Message}\n{ex.StackTrace}");
                 }
 
                 placed++;
@@ -233,9 +257,8 @@ public class AIRaceGridSpawner : MonoBehaviour
         {
             rb = ai.AddComponent<Rigidbody>();
         }
-        // AICarController sets this to kinematic in Awake. That means AI-AI physics collisions
-        // are handled via the built-in separation pass; AI-vs-player collisions still apply
-        // forces to the player's (non-kinematic) rigidbody.
+        // AICarController is dynamic + gravity. Car-vs-car collisions (player and other AI) are
+        // filtered off via Physics.IgnoreCollision below; terrain/walls collide normally.
         rb.interpolation = RigidbodyInterpolation.Interpolate;
 
         // The Player_BMW prefab has two BoxColliders offset at z=+1.5 and z=-1.5 with size 1.8
@@ -293,49 +316,36 @@ public class AIRaceGridSpawner : MonoBehaviour
         ctrl.turboCooldown *= Random.Range(turboCooldownMultiplierRange.x, turboCooldownMultiplierRange.y);
         ctrl.accelerationTime = Random.Range(accelerationTimeRange.x, accelerationTimeRange.y);
         ctrl.startReactionDelay = Random.Range(reactionDelayRange.x, reactionDelayRange.y);
-
-        // Ground offset is applied later (in PlaceAIOnGround) after the car is activated,
-        // because it needs renderer bounds which aren't valid until the GameObject is live.
     }
 
     /// <summary>
-    /// Moves `ai` so that the LOWEST visible point of the car (bottom of the wheel mesh / chassis)
-    /// rests exactly on the ground directly below its spawn position, and computes the
-    /// groundYOffset the AICarController needs to maintain that pose as the car moves.
+    /// Moves `ai` so that the LOWEST visible point of the car rests on the ground directly
+    /// below its spawn position. Once placed, gravity holds the dynamic body in contact.
     /// Must be called AFTER the AI has been activated so renderer bounds are populated.
     /// </summary>
     void PlaceAIOnGround(GameObject ai)
     {
-        AICarController ctrl = ai.GetComponent<AICarController>();
-        if (ctrl == null) return;
-
-        // 1. Find ground Y directly under the AI, ignoring the AI's own colliders.
         if (!RaycastGroundBelow(ai.transform.position, ai.transform, out float groundY))
             return; // no ground found; leave AI at its current Y
 
-        // 2. Find the AI's visible lowest point from combined renderer bounds.
         Bounds? visual = ComputeVisualBounds(ai);
         if (!visual.HasValue) return;
 
         float lowestVisualY = visual.Value.min.y;
-
-        // 3. Delta = how far to move the AI so its lowest visual Y sits on the ground.
         float delta = groundY - lowestVisualY;
         Vector3 p = ai.transform.position;
         p.y += delta;
-        ai.transform.position = p;
-
-        // 4. Record the offset from ground the controller should maintain going forward:
-        // offset = transform.y - groundY. That keeps the wheels-on-ground invariant as the AI
-        // drives over terrain of varying height.
-        ctrl.groundYOffset = p.y - groundY;
+        // Use rb.position on a dynamic body — directly setting transform.position triggers
+        // a "Rigidbody.position is being set in the same frame" warning and can clash with
+        // physics interpolation.
+        Rigidbody rb = ai.GetComponent<Rigidbody>();
+        if (rb != null) rb.position = p;
+        else ai.transform.position = p;
     }
 
     /// <summary>
     /// Disable physical collision between this AI's colliders and the player car's colliders.
-    /// Without this, the kinematic AI body shoves the dynamic player rigidbody on every overlap,
-    /// and PhysX often resolves it by ejecting the player vertically (the "fly into the air on
-    /// bump" bug). Soft pushback is still applied via AICarController.PushPlayerIfClose.
+    /// Player passes cleanly through AI cars (and vice versa — IgnoreCollision is symmetric).
     /// </summary>
     void IgnorePhysicalCollisionWithPlayer(GameObject ai)
     {
@@ -356,6 +366,33 @@ public class AIRaceGridSpawner : MonoBehaviour
             {
                 if (pc == null || pc.isTrigger) continue;
                 Physics.IgnoreCollision(ac, pc, true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Disable physical collision between this newly-spawned AI and every previously-spawned AI
+    /// in the scene. Combined with the player ignore above, this means car-vs-car never causes
+    /// physics impulses — exactly what we want now that all AI are dynamic rigidbodies.
+    /// Soft separation in AICarController.ApplySeparationVelocity still spreads them apart visually.
+    /// </summary>
+    void IgnoreCollisionWithOtherAI(GameObject newAI)
+    {
+        Collider[] newColliders = newAI.GetComponentsInChildren<Collider>(includeInactive: true);
+        AICarController[] existingAI = FindObjectsByType<AICarController>(FindObjectsSortMode.None);
+
+        foreach (AICarController other in existingAI)
+        {
+            if (other == null || other.gameObject == newAI) continue;
+            Collider[] otherColliders = other.GetComponentsInChildren<Collider>(includeInactive: true);
+            foreach (Collider nc in newColliders)
+            {
+                if (nc == null || nc.isTrigger) continue;
+                foreach (Collider oc in otherColliders)
+                {
+                    if (oc == null || oc.isTrigger) continue;
+                    Physics.IgnoreCollision(nc, oc, true);
+                }
             }
         }
     }
