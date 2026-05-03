@@ -50,12 +50,9 @@ public class AICarController : MonoBehaviour
     [Tooltip("Multiplier on the lateral (sideways) component of the separation push. >1 spreads cars across the road instead of stacking on the racing line. ~2.5 keeps them in distinct lanes.")]
     public float lateralSeparationBias = 2.5f;
 
-    [Header("Player Pushback")]
-    [Tooltip("If true, the AI applies a soft impulse to the player when too close. Set false (default) to let the player phase through cleanly with no interaction.")]
-    public bool applyPlayerPushback = false;
-    public Rigidbody playerRigidbody;
-    public float pushDistance = 3f;
-    public float pushForce = 6f;
+    // Spawner sets this for rubber-band distance computation; AI no longer applies any force
+    // to the player (we want zero physical interaction — IgnoreCollision in spawner enforces that).
+    [HideInInspector] public Rigidbody playerRigidbody;
 
     [Header("Turbo")]
     public float turboSpeedMultiplier = 2f;
@@ -77,29 +74,43 @@ public class AICarController : MonoBehaviour
     [Tooltip("Seconds this AI waits after the countdown ends before starting to move. Gives the pack a natural staggered launch instead of all 7 taking off in lockstep.")]
     public float startReactionDelay = 0f;
 
-    [Header("Ground Snap")]
-    [Tooltip("If true, the AI's Y is snapped to the ground below it every FixedUpdate via a downward raycast. Required when the car is kinematic (which it is) and the track has elevation changes.")]
-    public bool snapToGround = true;
+    [Header("Dynamic Body Propulsion")]
+    [Tooltip("Max horizontal acceleration (m/s^2) the propulsion force can apply. Higher = snappier response to target speed; lower = more sluggish/realistic.")]
+    public float accelerationForceMax = 30f;
 
-    [Tooltip("Distance above the ground surface where the rigidbody origin should sit. 0.7 matches the Player_BMW's resting height.")]
-    public float groundYOffset = 0.7f;
+    [Tooltip("Per-frame multiplier on the lateral (sideways) component of the rigidbody's velocity. <1 = sideways drift bleeds off (1 = no lateral damping, 0 = instant lateral kill). 0.5 is a reasonable middle.")]
+    [Range(0f, 1f)] public float lateralDampFactor = 0.6f;
 
-    [Tooltip("Layers that count as ground. Include Terrain and Default; exclude the car's own layer if it self-hits.")]
+    [Tooltip("If true, applies an upward force on slopes equal to the gravity component pulling the car down the slope, so the car doesn't lose speed climbing ramps. Uses a downward raycast to detect grounding.")]
+    public bool slopeAssist = true;
+
+    [Tooltip("Layers that count as ground for slope-assist + grounding checks. Should include Terrain and Default.")]
     public LayerMask groundMask = ~0;
 
-    [Header("Solid Obstacle Avoidance")]
-    [Tooltip("If true, the AI sweep-tests before moving and won't pass through terrain, walls, the player, or other static obstacles. AI-vs-AI is handled by the soft separation below.")]
-    public bool blockAgainstSolids = true;
+    [Header("Out-of-Bounds Respawn")]
+    [Tooltip("If true, the AI auto-teleports back onto the racing line when it falls off the map (Y too far below the next waypoint, or horizontal distance too far from it).")]
+    public bool autoRespawnIfFallenOff = true;
 
-    [Tooltip("Layers counted as blocking obstacles. Should include Terrain, Default, and anything the car shouldn't phase through.")]
-    public LayerMask obstacleMask = ~0;
+    [Tooltip("Meters below the current target waypoint after which the AI is considered to have fallen off and is respawned. Should be higher than the deepest legitimate dip on the track.")]
+    public float fallenBelowThreshold = 40f;
 
-    [Tooltip("How far the AI is pushed back from a solid on contact. Small values prevent jitter.")]
-    public float obstacleSkin = 0.05f;
+    [Tooltip("Meters of horizontal distance from the current target waypoint after which the AI is considered off-course and respawned. Set high (or 0 to disable) — long straights between waypoints can legitimately put the AI hundreds of meters from the next waypoint.")]
+    public float maxDistanceFromTrack = 0f;
 
-    private readonly RaycastHit[] groundHits = new RaycastHit[8];
-    private readonly RaycastHit[] obstacleHits = new RaycastHit[16];
-    private readonly Collider[] overlapBuffer = new Collider[16];
+    [Tooltip("Cooldown after a respawn before the AI can be respawned again — prevents ping-ponging if the respawn point is itself on a sketchy surface.")]
+    public float respawnCooldown = 2f;
+
+    [Tooltip("Height (meters) above the waypoint to spawn at, so the car drops onto the road instead of clipping into it.")]
+    public float respawnHeightOffset = 1.5f;
+
+    [Tooltip("Grace period (seconds) after the race starts before stuck/fall-off detection runs. Gives the AI time to accelerate from 0 and clear the start grid. If teleports are firing right after countdown, raise this.")]
+    public float stuckGraceAfterRaceStart = 4f;
+
+    [Tooltip("Seconds of barely-moving (less than ~1 m/s) after grace before the AI is declared stuck and teleported to the next waypoint. Lower = more aggressive recovery. Raise if AI is teleporting when they're actually just slow.")]
+    public float stuckTimeout = 1.5f;
+
+    [Tooltip("If true, log a console message every time an AI teleports — useful for figuring out WHY they're teleporting (stuck vs fallen off).")]
+    public bool logTeleports = true;
 
     private float raceStartTimestamp = -1f;
     private Rigidbody rb;
@@ -108,13 +119,10 @@ public class AICarController : MonoBehaviour
     private bool raceFinished = false;
 
     // Stuck recovery: tracks how long the AI has been making basically no forward progress.
-    // After STUCK_TIMEOUT, force-advance the waypoint and disable obstacle blocking briefly so
-    // the AI can phase past whatever it caught on (geometry, another AI, the player).
+    // After stuckTimeout, advance to the next waypoint and teleport directly onto it so the
+    // AI can't get pinned against a wall, an upside-down landing, or another AI for long.
     private Vector3 lastProgressPosition;
     private float stuckTimer = 0f;
-    private float panicRecoveryEndTime = -1f;
-    private const float STUCK_TIMEOUT = 1.5f;
-    private const float PANIC_RECOVERY_DURATION = 1.8f;
     private const float STUCK_MIN_DISTANCE_PER_SECOND = 1.0f;
 
     private bool isTurboActive = false;
@@ -127,6 +135,7 @@ public class AICarController : MonoBehaviour
     private float currentSpeed = 0f;
     private float coastDistance = 0f;
     private bool waitingForFinalFinishCross = false;
+    private float lastRespawnTime = -10f;
     private float externalSpeedMultiplier = 1f;
 
     private static AICarController[] allAICars;
@@ -134,11 +143,42 @@ public class AICarController : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
+
+        // Fully dynamic: gravity holds the car on the ground, physics handles ramps and falls,
+        // jumps off ramps just work because gravity does. Car-vs-car collisions (player and
+        // other AI) are filtered off in the spawner via Physics.IgnoreCollision.
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.linearDamping = 0f;
+        rb.angularDamping = 5f;
+        // Match the player's mass (CarController sets 120) so propulsion forces have the same
+        // feel and so collision response with terrain is consistent.
+        rb.mass = 120f;
+
+        // Only freeze yaw — steering uses MoveRotation around Y. Pitch (X) and roll (Z) stay
+        // free so the car body naturally tilts to follow ramps and banked turns. LateUpdate
+        // below catches extreme tilts (terrain glitches) and re-levels the car.
+        rb.constraints = RigidbodyConstraints.FreezeRotationY;
 
         noiseOffsetX = Random.Range(0f, 100f);
         noiseOffsetZ = Random.Range(0f, 100f);
         RandomizeLapLine();
+    }
+
+    /// <summary>
+    /// Safety net: if terrain or a collision flips the car past 60° of pitch or roll, snap it
+    /// back to flat (preserving heading). Mirrors the same guard in CarController.
+    /// </summary>
+    void LateUpdate()
+    {
+        Vector3 e = transform.eulerAngles;
+        float xTilt = e.x > 180f ? e.x - 360f : e.x;
+        float zTilt = e.z > 180f ? e.z - 360f : e.z;
+        if (Mathf.Abs(xTilt) > 60f || Mathf.Abs(zTilt) > 60f)
+        {
+            transform.rotation = Quaternion.Euler(0f, e.y, 0f);
+            if (rb != null) rb.angularVelocity = Vector3.zero;
+        }
     }
 
     void Start()
@@ -146,7 +186,7 @@ public class AICarController : MonoBehaviour
         // Static cache shared across every AI in the scene. Only the first AI's Start
         // populates it; the rest see the cached array and skip the scene scan.
         // Stale entries (AIs destroyed mid-race) are tolerated via the null check
-        // inside ApplySeparation.
+        // inside ApplySeparationVelocity.
         if (allAICars == null || allAICars.Length == 0)
             allAICars = FindObjectsByType<AICarController>(FindObjectsSortMode.None);
     }
@@ -184,6 +224,21 @@ public class AICarController : MonoBehaviour
         if (raceFinished)
         {
             CoastOut();
+            return;
+        }
+
+        // Out-of-bounds: if we've fallen off the map, snap back to the waypoint we were
+        // heading toward so the AI doesn't fall forever or get stranded under the world.
+        // Skipped during the same race-start grace period as stuck detection — at spawn the
+        // AI might legitimately be far from waypoint 0 vertically (street level vs elevated
+        // section) which would otherwise trigger an immediate teleport on race start.
+        if (autoRespawnIfFallenOff
+            && Time.time - raceStartTimestamp >= stuckGraceAfterRaceStart
+            && Time.time - lastRespawnTime > respawnCooldown
+            && IsFallenOffMap())
+        {
+            if (logTeleports) Debug.Log($"[AI {name}] Teleporting (FALLEN OFF) — y={rb.position.y:F1}, target wp Y={waypointPath.GetWaypoint(currentWaypointIndex)?.position.y:F1}");
+            RespawnAtCurrentWaypoint();
             return;
         }
 
@@ -250,34 +305,28 @@ public class AICarController : MonoBehaviour
         // multiplicative stacking I might add later.
         targetSpeed = Mathf.Min(targetSpeed, maxSpeed * 2.5f);
 
-        // --- Smooth acceleration ---
+        // --- Smooth acceleration of the speed target ---
         currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, (maxSpeed / accelerationTime) * Time.fixedDeltaTime);
 
-        // --- Move ---
-        Vector3 newPos = rb.position + transform.forward * currentSpeed * Time.fixedDeltaTime;
+        // --- Propulsion (force-based, dynamic body) ---
+        // Drive horizontal velocity toward (forward * currentSpeed) via clamped impulse force.
+        // Y velocity is left to gravity / collision so ramps + jumps "just work".
+        ApplyPropulsion(currentSpeed);
 
-        // Ground snap: without this a kinematic AI just keeps its spawn Y forever, which
-        // floats on any elevation change in the track.
-        if (snapToGround)
-            SnapYToGround(ref newPos);
-        else
-            newPos.y = rb.position.y;
+        // Lateral velocity damping: bleed off sideways drift so the car doesn't slide on turns.
+        // Without this the dynamic body skids outward through every corner because we're not
+        // using wheel colliders to provide grip.
+        DampLateralVelocity();
 
-        newPos = ApplySeparation(newPos);
+        // Soft separation pushes us away from nearby AI without using physics collision (which
+        // is filtered off via IgnoreCollision). Applied as an additive velocity tweak.
+        ApplySeparationVelocity();
 
-        // Obstacle avoidance: AI is kinematic so Unity won't resolve collisions with terrain,
-        // walls, or other AI. Sweep-test the intended move and clamp distance if anything
-        // blocks the path. Hard-separates AI-vs-AI as a safety net over the soft separation.
-        // Skipped during panic recovery so the AI can phase past whatever it got stuck on.
-        bool inPanic = Time.time < panicRecoveryEndTime;
-        if (blockAgainstSolids && !inPanic)
-            ClampAgainstObstacles(ref newPos);
+        // Slope assist: cancel the slope-tangent component of gravity when grounded so the AI
+        // doesn't lose speed climbing ramps. Player CarController does the same.
+        if (slopeAssist) ApplySlopeAssist();
 
-        rb.MovePosition(newPos);
-
-        UpdateStuckRecovery(newPos);
-
-        PushPlayerIfClose();
+        UpdateStuckRecovery(rb.position);
 
         // Advance either by reach distance OR by having driven past the waypoint along the path.
         bool reached = dist < waypointReachDistance;
@@ -287,17 +336,72 @@ public class AICarController : MonoBehaviour
     }
 
     /// <summary>
-    /// Tracks forward progress and triggers panic recovery if the AI has been stuck. Recovery
-    /// = force-advance the waypoint and skip obstacle blocking for ~2 seconds so the AI can
-    /// phase past whatever caught it (wall corner, another AI, the player, etc.).
+    /// Applies a clamped force that drives the rigidbody's HORIZONTAL velocity toward
+    /// (forward * targetSpeed). Vertical velocity is preserved so gravity owns falls and jumps.
+    /// </summary>
+    private void ApplyPropulsion(float targetSpeed)
+    {
+        Vector3 forward = transform.forward;
+        forward.y = 0f;
+        if (forward.sqrMagnitude < 0.0001f) return;
+        forward.Normalize();
+
+        Vector3 desiredHorizontal = forward * targetSpeed;
+        Vector3 currentHorizontal = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        Vector3 velError = desiredHorizontal - currentHorizontal;
+
+        // Convert velocity error into a force this fixed step would resolve at unit mass; clamp
+        // by accelerationForceMax * mass so we don't snap-change velocity unrealistically.
+        Vector3 force = velError * rb.mass / Time.fixedDeltaTime;
+        force = Vector3.ClampMagnitude(force, accelerationForceMax * rb.mass);
+        rb.AddForce(force, ForceMode.Force);
+    }
+
+    /// <summary>
+    /// Reduces the lateral (car-local-X) component of velocity each frame, preserving forward
+    /// and vertical. Replaces wheel-collider grip — without it the dynamic body skids in turns.
+    /// </summary>
+    private void DampLateralVelocity()
+    {
+        Vector3 localVel = transform.InverseTransformDirection(rb.linearVelocity);
+        localVel.x *= lateralDampFactor;
+        rb.linearVelocity = transform.TransformDirection(localVel);
+    }
+
+    /// <summary>
+    /// On slopes, gravity pulls the car down the slope tangent — that drag would slow ramp
+    /// climbs noticeably. Cancel just that tangent component when grounded.
+    /// </summary>
+    private void ApplySlopeAssist()
+    {
+        if (!Physics.Raycast(rb.position + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit,
+            2f, groundMask, QueryTriggerInteraction.Ignore)) return;
+        // Skip anything attached to a Rigidbody (other cars) — only true terrain/walls assist.
+        if (hit.collider.attachedRigidbody != null) return;
+        if (Vector3.Dot(hit.normal, Vector3.up) > 0.99f) return; // flat ground — no assist needed
+
+        Vector3 slopeTangentGravity = Vector3.ProjectOnPlane(Physics.gravity, hit.normal);
+        rb.AddForce(-slopeTangentGravity, ForceMode.Acceleration);
+    }
+
+    /// <summary>
+    /// Tracks forward progress. After STUCK_TIMEOUT seconds of basically no horizontal movement,
+    /// advance to the next waypoint and teleport the AI directly there. Necessary because the
+    /// dynamic body can get pinned against a wall, an upside-down landing, or another AI's
+    /// pushed-aside debris — and unlike the kinematic flow, there's no obstacle-clamp to bypass.
     /// </summary>
     private void UpdateStuckRecovery(Vector3 currentPos)
     {
-        if (Time.time < panicRecoveryEndTime) return; // already recovering
-
-        if (lastProgressPosition == Vector3.zero)
+        // Race-start grace period: the AI accelerates from 0 m/s after countdown ends, and the
+        // first ~2 seconds of that ramp look like "no progress" to the distance check. Without
+        // this skip, every AI gets force-teleported the moment the race starts.
+        // Also covers any cooldown after a recent respawn.
+        if (Time.time - raceStartTimestamp < stuckGraceAfterRaceStart
+            || Time.time - lastRespawnTime < respawnCooldown
+            || lastProgressPosition == Vector3.zero)
         {
             lastProgressPosition = currentPos;
+            stuckTimer = 0f;
             return;
         }
 
@@ -309,11 +413,12 @@ public class AICarController : MonoBehaviour
         if (distMoved < requiredPerStep)
         {
             stuckTimer += Time.fixedDeltaTime;
-            if (stuckTimer >= STUCK_TIMEOUT)
+            if (stuckTimer >= stuckTimeout)
             {
-                panicRecoveryEndTime = Time.time + PANIC_RECOVERY_DURATION;
+                if (logTeleports) Debug.Log($"[AI {name}] Teleporting (STUCK) — wasn't moving > 1 m/s for {stuckTimeout:F1}s. Was at {currentPos:F1}, target wp at {waypointPath.GetWaypoint(currentWaypointIndex)?.position:F1}");
                 stuckTimer = 0f;
                 AdvanceWaypoint();
+                RespawnAtCurrentWaypoint();
             }
         }
         else
@@ -324,37 +429,74 @@ public class AICarController : MonoBehaviour
     }
 
     /// <summary>
+    /// True if the AI has fallen off the world: too far below its current target waypoint (Y),
+    /// or (if enabled) too far horizontally away from it. The horizontal check is OFF by default
+    /// because long straights between waypoints can legitimately put the AI hundreds of meters
+    /// from the next waypoint, and dynamic-body AI doesn't really fly off-track laterally
+    /// anymore (terrain collision keeps them on the road).
+    /// </summary>
+    private bool IsFallenOffMap()
+    {
+        if (waypointPath == null || waypointPath.WaypointCount == 0) return false;
+        Transform target = waypointPath.GetWaypoint(currentWaypointIndex);
+        if (target == null) return false;
+
+        // Y-fall check: AI is well below where the next checkpoint sits.
+        if (rb.position.y < target.position.y - fallenBelowThreshold) return true;
+
+        // Horizontal-distance check (opt-in only — set maxDistanceFromTrack > 0).
+        if (maxDistanceFromTrack > 0f)
+        {
+            Vector3 horizontal = rb.position - target.position;
+            horizontal.y = 0f;
+            if (horizontal.magnitude > maxDistanceFromTrack) return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Teleport the AI to the waypoint it was heading toward, reset velocity, and orient it
+    /// along the path. Used when the AI has fallen off the map. Brief cooldown afterward
+    /// stops repeated triggers if the respawn point itself is on shaky ground.
+    /// </summary>
+    private void RespawnAtCurrentWaypoint()
+    {
+        Transform target = waypointPath.GetWaypoint(currentWaypointIndex);
+        if (target == null) return;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.position = target.position + Vector3.up * respawnHeightOffset;
+
+        // Face along the path toward the next waypoint after this one (so we land oriented
+        // forward, not sideways).
+        Transform next = waypointPath.GetWaypoint(currentWaypointIndex + 1);
+        if (next != null)
+        {
+            Vector3 dir = next.position - target.position;
+            dir.y = 0f;
+            if (dir.sqrMagnitude > 0.001f)
+                rb.rotation = Quaternion.LookRotation(dir.normalized, Vector3.up);
+        }
+
+        currentSpeed = 0f;
+        lastRespawnTime = Time.time;
+    }
+
+    /// <summary>
     /// Called every FixedUpdate while the race is finished. Decelerates the car from whatever
     /// speed it had when crossing the line and rolls it to a stop, so the AI actually appears
     /// to finish the race and coast out rather than stopping dead at the waypoint.
     /// </summary>
     private void CoastOut()
     {
-        if (currentSpeed <= 0.01f) return; // fully stopped — leave it parked
-
         currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, finishDeceleration * Time.fixedDeltaTime);
+        coastDistance += currentSpeed * Time.fixedDeltaTime;
+        if (coastDistance >= maxCoastDistance) currentSpeed = 0f;
 
-        float stepDistance = currentSpeed * Time.fixedDeltaTime;
-        coastDistance += stepDistance;
-
-        // Safety: stop forcibly if we've coasted further than the cap (e.g., coasting down a hill).
-        if (coastDistance >= maxCoastDistance)
-        {
-            currentSpeed = 0f;
-            return;
-        }
-
-        Vector3 newPos = rb.position + transform.forward * currentSpeed * Time.fixedDeltaTime;
-
-        if (snapToGround)
-            SnapYToGround(ref newPos);
-        else
-            newPos.y = rb.position.y;
-
-        if (blockAgainstSolids)
-            ClampAgainstObstacles(ref newPos);
-
-        rb.MovePosition(newPos);
+        ApplyPropulsion(currentSpeed);
+        DampLateralVelocity();
     }
 
     /// <summary>
@@ -426,176 +568,48 @@ public class AICarController : MonoBehaviour
     }
 
     /// <summary>
-    /// Box-cast the car's chassis in the direction of the intended move. If anything solid
-    /// (terrain, another AI, the player, props) is in the way, shorten the move so the car
-    /// stops against it instead of phasing through.
+    /// Soft separation: nudge our horizontal velocity AWAY from any nearby AI so the pack
+    /// spreads across the road instead of stacking on the racing line. Replaces the position-
+    /// based separation that worked when the AI was kinematic — we now write to rb.linearVelocity.
+    /// Physics collision between AIs is filtered off (IgnoreCollision in spawner).
     /// </summary>
-    private void ClampAgainstObstacles(ref Vector3 newPos)
+    private void ApplySeparationVelocity()
     {
-        Vector3 delta = newPos - rb.position;
-        delta.y = 0f; // only horizontal movement — ground snap owns Y
-        float distance = delta.magnitude;
-        if (distance < 0.0001f) return;
+        if (allAICars == null) return;
 
-        Vector3 direction = delta / distance;
-
-        // Size of the Player_BMW chassis (width, height, length) from its 3 BoxColliders
-        // combined: x=2.16, y=1.5, z=4.8. Half-extents below.
-        Vector3 halfExtents = new Vector3(1.08f, 0.75f, 2.4f);
-        Vector3 boxCenter = rb.position + rb.rotation * new Vector3(-0.09f, 0.28f, 0f);
-
-        int hitCount = Physics.BoxCastNonAlloc(
-            boxCenter, halfExtents, direction, obstacleHits, rb.rotation,
-            distance + obstacleSkin, obstacleMask, QueryTriggerInteraction.Ignore);
-
-        float allowed = distance;
-        for (int i = 0; i < hitCount; i++)
-        {
-            RaycastHit h = obstacleHits[i];
-            if (h.collider == null) continue;
-
-            // Skip our own colliders.
-            if (h.collider.transform == transform || h.collider.transform.IsChildOf(transform)) continue;
-
-            // Skip the player. Hard-clamping against the player car puts the kinematic AI in
-            // constant overlap with the non-kinematic player rigidbody, which PhysX resolves by
-            // ejecting the player every frame — feels like the player gets "stuck" on the AI.
-            // Leave player handling to PushPlayerIfClose (a soft impulse) and to PhysX's natural
-            // kinematic-vs-dynamic contact response.
-            if (h.collider.attachedRigidbody != null && h.collider.attachedRigidbody.GetComponent<CarController>() != null) continue;
-
-            // BoxCast reports 0 distance when a collider is already overlapping at start; ignore those.
-            if (h.distance <= 0f) continue;
-
-            float d = Mathf.Max(0f, h.distance - obstacleSkin);
-            if (d < allowed) allowed = d;
-        }
-
-        if (allowed < distance)
-        {
-            Vector3 clamped = rb.position + direction * allowed;
-            // Preserve whatever ground-snap already did to Y.
-            clamped.y = newPos.y;
-            newPos = clamped;
-        }
-    }
-
-    /// <summary>
-    /// Snap the AI to the ground at its (X, Z) position, keeping a constant offset above the
-    /// ground equal to this AI's groundYOffset. The offset is set once at spawn time by the
-    /// spawner (computed from the car's visual bounds so the wheels sit exactly on the ground).
-    /// This is independent of whatever Y the player happens to be at.
-    /// </summary>
-    private void SnapYToGround(ref Vector3 pos)
-    {
-        if (!TryFindGroundY(pos.x, pos.y + 5f, pos.z, this.transform, out float aiTerrainY))
-        {
-            pos.y = rb.position.y;
-            return;
-        }
-
-        pos.y = aiTerrainY + groundYOffset;
-    }
-
-    /// <summary>
-    /// Downward raycast that returns the Y of the nearest hit that is NOT attached to `selfRoot`
-    /// or its descendants. Used to find the actual ground below a car while ignoring the car
-    /// itself.
-    /// </summary>
-    private bool TryFindGroundY(float x, float y, float z, Transform selfRoot, out float groundY)
-    {
-        Vector3 rayStart = new Vector3(x, y, z);
-        int hitCount = Physics.RaycastNonAlloc(
-            rayStart, Vector3.down, groundHits, 60f, groundMask, QueryTriggerInteraction.Ignore);
-
-        float nearestDist = float.MaxValue;
-        float nearestY = 0f;
-        bool found = false;
-        for (int i = 0; i < hitCount; i++)
-        {
-            RaycastHit h = groundHits[i];
-            if (h.collider == null) continue;
-            if (selfRoot != null)
-            {
-                if (h.collider.transform == selfRoot) continue;
-                if (h.collider.transform.IsChildOf(selfRoot)) continue;
-            }
-            // Skip anything attached to a Rigidbody — that's the player or another AI car.
-            // Without this filter the ground-snap raycast can land on another car's roof and
-            // teleport this AI vertically up onto it.
-            if (h.collider.attachedRigidbody != null) continue;
-            if (h.distance < nearestDist)
-            {
-                nearestDist = h.distance;
-                nearestY = h.point.y;
-                found = true;
-            }
-        }
-        groundY = nearestY;
-        return found;
-    }
-
-    private Vector3 ApplySeparation(Vector3 proposedPos)
-    {
-        if (allAICars == null) return proposedPos;
-
-        // Build a "right" axis perpendicular to forward in the world plane so we can decompose
-        // the push into lateral (sideways across the track) vs longitudinal (along forward).
         Vector3 forwardFlat = transform.forward;
         forwardFlat.y = 0f;
         forwardFlat.Normalize();
         Vector3 rightFlat = Vector3.Cross(Vector3.up, forwardFlat);
 
+        Vector3 separationVel = Vector3.zero;
+
         foreach (AICarController other in allAICars)
         {
             if (other == null || other == this) continue;
 
-            Vector3 toOther = other.rb.position - proposedPos;
+            Vector3 toOther = other.rb.position - rb.position;
             toOther.y = 0f;
             float dist = toOther.magnitude;
+            if (dist >= separationDistance || dist <= 0.001f) continue;
 
-            if (dist < separationDistance && dist > 0.001f)
-            {
-                Vector3 pushDir = -toOther.normalized; // we push AWAY from other
+            Vector3 pushDir = -toOther.normalized;
+            float lateral = Vector3.Dot(pushDir, rightFlat);
+            float longitudinal = Vector3.Dot(pushDir, forwardFlat);
+            Vector3 weightedDir = (rightFlat * lateral * lateralSeparationBias) + (forwardFlat * longitudinal);
+            if (weightedDir.sqrMagnitude > 0.0001f) weightedDir.Normalize();
+            else weightedDir = pushDir;
 
-                // Re-weight: amplify the sideways component so cars spread across the road
-                // instead of stacking on the racing line.
-                float lateral = Vector3.Dot(pushDir, rightFlat);
-                float longitudinal = Vector3.Dot(pushDir, forwardFlat);
-                Vector3 weightedDir = (rightFlat * lateral * lateralSeparationBias) + (forwardFlat * longitudinal);
-                if (weightedDir.sqrMagnitude > 0.0001f) weightedDir.Normalize();
-                else weightedDir = pushDir;
-
-                float overlap = separationDistance - dist;
-                proposedPos += weightedDir * overlap * separationStrength * Time.fixedDeltaTime;
-                proposedPos.y = rb.position.y;
-            }
+            float overlap = separationDistance - dist;
+            separationVel += weightedDir * overlap * separationStrength;
         }
 
-        return proposedPos;
-    }
+        if (separationVel.sqrMagnitude < 0.0001f) return;
 
-    private void PushPlayerIfClose()
-    {
-        if (!applyPlayerPushback) return;
-        if (playerRigidbody == null) return;
-
-        Vector3 toPlayer = playerRigidbody.position - rb.position;
-        toPlayer.y = 0f;
-        float dist = toPlayer.magnitude;
-
-        if (dist < pushDistance && dist > 0.01f)
-        {
-            Vector3 pushDir = toPlayer.normalized;
-            pushDir.y = 0f;
-
-            Vector3 currentPlayerVel = playerRigidbody.linearVelocity;
-            playerRigidbody.AddForce(pushDir * pushForce, ForceMode.Impulse);
-
-            Vector3 newVel = playerRigidbody.linearVelocity;
-            newVel.y = currentPlayerVel.y;
-            playerRigidbody.linearVelocity = newVel;
-        }
+        Vector3 v = rb.linearVelocity;
+        v.x += separationVel.x;
+        v.z += separationVel.z;
+        rb.linearVelocity = v;
     }
 
     private Vector3 GetRacingLineTarget(Transform currentWaypoint)
