@@ -21,6 +21,7 @@ public class RaceTimer : MonoBehaviour
             {
                 finished = true;
                 PlayerPrefs.SetFloat("RaceTime", elapsedTime);
+                PlayerPrefs.SetFloat("RaceTime_" + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name, elapsedTime);
                 PlayerPrefs.Save();
             }
             else

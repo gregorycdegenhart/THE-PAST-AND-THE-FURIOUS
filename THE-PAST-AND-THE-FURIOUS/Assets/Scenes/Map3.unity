@@ -5350,6 +5350,7 @@ MonoBehaviour:
   blueCarPrefab: {fileID: 270355423608437863, guid: 91be063debd54eb48bb20fcd76953a3b, type: 3}
   spawnPoint: {fileID: 0}
   defaultIndex: 0
+  disableHeadlights: 0
 --- !u!4 &348904040
 Transform:
   m_ObjectHideFlags: 0
@@ -24050,6 +24051,7 @@ MonoBehaviour:
   - {r: 0.12, g: 0.12, b: 0.14, a: 1}
   raceType: 1
   totalLaps: 3
+  disableHeadlights: 0
   logSpawns: 1
 --- !u!4 &1363802185
 Transform:
@@ -36502,7 +36504,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2269013720095321534, guid: 0317d6a8fa0b5a7429fa2a3c08ecdec9, type: 3}
       propertyPath: nextSceneName
-      value: WinScene
+      value: AztecWinScene
       objectReference: {fileID: 0}
     - target: {fileID: 4472505811862783922, guid: 0317d6a8fa0b5a7429fa2a3c08ecdec9, type: 3}
       propertyPath: m_Name
