@@ -15,7 +15,7 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.40129942, g: 0.47673565, b: 0.509434, a: 1}
+  m_FogColor: {r: 0.5741812, g: 0.6330322, b: 0.6509434, a: 1}
   m_FogMode: 3
   m_FogDensity: 0.008
   m_LinearFogStart: 0
@@ -7743,6 +7743,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5325998456119052174, guid: d4429fcd1df612d45986640402b653e3, type: 3}
   m_PrefabInstance: {fileID: 349185759}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &350162205 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+  m_PrefabInstance: {fileID: 555671819}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &351694175 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4494065879240407048, guid: 34161fc80af2d6a4fb2fd1113de89d15, type: 3}
@@ -12278,6 +12283,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3599e063fee3be46a16485d04f623fc, type: 3}
+--- !u!1001 &555671819
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1000105034}
+    m_Modifications:
+    - target: {fileID: 3302691358727123904, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_Name
+      value: Rain Particles
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.9888844
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 16.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.02651349
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7374323603483073555, guid: 13622ab161f55634281c67f05148d49b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 13622ab161f55634281c67f05148d49b, type: 3}
 --- !u!1001 &556340789
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29162,7 +29224,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5885948494470392538, guid: 91be063debd54eb48bb20fcd76953a3b, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 350162205}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91be063debd54eb48bb20fcd76953a3b, type: 3}
 --- !u!1001 &1192290668
