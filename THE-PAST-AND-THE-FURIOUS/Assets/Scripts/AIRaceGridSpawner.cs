@@ -94,6 +94,9 @@ public class AIRaceGridSpawner : MonoBehaviour
     public RaceManager.RaceType raceType = RaceManager.RaceType.Laps;
     public int totalLaps = 3;
 
+    [Tooltip("If true, disable any Light components on objects named '*Headlight*' on each spawned AI. Use for daytime maps.")]
+    public bool disableHeadlights = false;
+
     [Header("Debug")]
     public bool logSpawns = true;
 
@@ -189,6 +192,11 @@ public class AIRaceGridSpawner : MonoBehaviour
 
                     if (randomizeAIColors)
                         ApplyRandomColor(ai);
+
+                    if (disableHeadlights)
+                        foreach (var lt in ai.GetComponentsInChildren<Light>(true))
+                            if (lt.gameObject.name.IndexOf("Headlight", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                                lt.enabled = false;
 
                     IgnorePhysicalCollisionWithPlayer(ai);
                     IgnoreCollisionWithOtherAI(ai);
