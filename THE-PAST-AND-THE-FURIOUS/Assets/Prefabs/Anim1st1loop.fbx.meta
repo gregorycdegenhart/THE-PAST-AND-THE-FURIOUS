@@ -1,0 +1,964 @@
+fileFormatVersion: 2
+guid: 0a6b10ad3d737b24d8ea0538942ffe33
+ModelImporter:
+  serializedVersion: 24200
+  internalIDToNameTable: []
+  externalObjects: {}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: "\nClip 'Take 001' has import animation warnings that
+      might lower retargeting quality:\nNote: Activate translation DOF on avatar
+      to improve retargeting quality.\n\t'biker_fem:spine_01' is inbetween humanoid
+      transforms and has rotation animation that will be discarded.\n\t'biker_fem:spine_05'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'biker_fem:neck_02'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n"
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Take 001
+      takeName: Take 001
+      internalID: 1827226128182048838
+      firstFrame: 90
+      lastFrame: 106
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human:
+    - boneName: biker_fem:pelvis
+      humanName: Hips
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:thigh_l
+      humanName: LeftUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:thigh_r
+      humanName: RightUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:calf_l
+      humanName: LeftLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:calf_r
+      humanName: RightLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:foot_l
+      humanName: LeftFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:foot_r
+      humanName: RightFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:spine_02
+      humanName: Spine
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:spine_03
+      humanName: Chest
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:neck_01
+      humanName: Neck
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:head
+      humanName: Head
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:clavicle_l
+      humanName: LeftShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:clavicle_r
+      humanName: RightShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:upperarm_l
+      humanName: LeftUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:upperarm_r
+      humanName: RightUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:lowerarm_l
+      humanName: LeftLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:lowerarm_r
+      humanName: RightLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:hand_l
+      humanName: LeftHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:hand_r
+      humanName: RightHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:thumb_01_l
+      humanName: Left Thumb Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:thumb_02_l
+      humanName: Left Thumb Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:thumb_03_l
+      humanName: Left Thumb Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:index_metacarpal_l
+      humanName: Left Index Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:index_01_l
+      humanName: Left Index Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:index_02_l
+      humanName: Left Index Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:middle_metacarpal_l
+      humanName: Left Middle Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:middle_01_l
+      humanName: Left Middle Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:middle_02_l
+      humanName: Left Middle Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:ring_metacarpal_l
+      humanName: Left Ring Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:ring_01_l
+      humanName: Left Ring Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:ring_02_l
+      humanName: Left Ring Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:pinky_metacarpal_l
+      humanName: Left Little Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:pinky_01_l
+      humanName: Left Little Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:pinky_02_l
+      humanName: Left Little Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:thumb_01_r
+      humanName: Right Thumb Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:thumb_02_r
+      humanName: Right Thumb Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:thumb_03_r
+      humanName: Right Thumb Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:index_metacarpal_r
+      humanName: Right Index Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:index_01_r
+      humanName: Right Index Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:index_02_r
+      humanName: Right Index Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:middle_metacarpal_r
+      humanName: Right Middle Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:middle_01_r
+      humanName: Right Middle Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:middle_02_r
+      humanName: Right Middle Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:ring_metacarpal_r
+      humanName: Right Ring Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:ring_01_r
+      humanName: Right Ring Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:ring_02_r
+      humanName: Right Ring Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:pinky_metacarpal_r
+      humanName: Right Little Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:pinky_01_r
+      humanName: Right Little Intermediate
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:pinky_02_r
+      humanName: Right Little Distal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: biker_fem:spine_04
+      humanName: UpperChest
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    skeleton:
+    - name: Anim1st1loop(Clone)
+      parentName: 
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 100, y: 100, z: 100}
+    - name: biker_fem:pelvis
+      parentName: Anim1st1loop(Clone)
+      position: {x: -0.000004867017, y: -0.0007175934, z: 0.009630723}
+      rotation: {x: 0.45442918, y: -0.5683877, z: -0.4654078, w: 0.5038107}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:spine_01
+      parentName: biker_fem:pelvis
+      position: {x: 0.000000005211301, y: 0.00024718544, z: -9.8906286e-11}
+      rotation: {x: -0.007437282, y: 0.0062772287, z: -0.13363433, w: 0.99098295}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:spine_02
+      parentName: biker_fem:spine_01
+      position: {x: 0.0000000014465851, y: 0.00049870025, z: 3.6567974e-11}
+      rotation: {x: -0.0007175624, y: 0.012827841, z: 0.0919326, w: 0.99568236}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:spine_03
+      parentName: biker_fem:spine_02
+      position: {x: 3.861838e-10, y: 0.0007626431, z: 3.29727e-11}
+      rotation: {x: 0.0012023307, y: 0.012781619, z: 0.122263074, w: 0.9924147}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:spine_04
+      parentName: biker_fem:spine_03
+      position: {x: -0.0000000015903859, y: 0.0008850827, z: -2.6257411e-11}
+      rotation: {x: 0.003275101, y: 0.012416996, z: 0.10628992, w: 0.99425226}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:spine_05
+      parentName: biker_fem:spine_04
+      position: {x: 0.000000024504143, y: 0.0017498367, z: 4.6377603e-11}
+      rotation: {x: 0.004211767, y: 0.012136451, z: 0.03475612, w: 0.9993133}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:neck_01
+      parentName: biker_fem:spine_05
+      position: {x: 0.00031002663, y: 0.0011241313, z: -6.088139e-10}
+      rotation: {x: -0.0033120746, y: 0.015456758, z: -0.08348511, w: 0.9963837}
+      scale: {x: 0.9999994, y: 1, z: 1}
+    - name: biker_fem:neck_02
+      parentName: biker_fem:neck_01
+      position: {x: -0.0000000358165, y: 0.00033719878, z: -6.3645027e-12}
+      rotation: {x: -0.007747206, y: 0.015535938, z: 0.07269821, w: 0.99720293}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:head
+      parentName: biker_fem:neck_02
+      position: {x: -0.00000006586966, y: 0.00026627813, z: 0.000000009649799}
+      rotation: {x: -0.02961926, y: 0.055741675, z: 0.38709345, w: 0.9198773}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:head_end
+      parentName: biker_fem:head
+      position: {x: -0, y: 0.0027675717, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:clavicle_l
+      parentName: biker_fem:spine_05
+      position: {x: -0.000100520934, y: 0.0005830539, z: 0.00009313544}
+      rotation: {x: 0.703521, y: -0.114500426, z: -0.036342237, w: 0.7004478}
+      scale: {x: 0.9999995, y: 1, z: 1}
+    - name: biker_fem:upperarm_l
+      parentName: biker_fem:clavicle_l
+      position: {x: 1.1316909e-10, y: 0.0013861288, z: -4.6616e-10}
+      rotation: {x: 0.009402631, y: 0.51168114, z: -0.06875427, w: 0.8563684}
+      scale: {x: 0.99999946, y: 1, z: 1}
+    - name: biker_fem:lowerarm_l
+      parentName: biker_fem:upperarm_l
+      position: {x: 0.000053504587, y: 0.0023864831, z: 0.00003229978}
+      rotation: {x: -0.016023537, y: -0.30486867, z: 0.020571062, w: 0.95203745}
+      scale: {x: 0.9999995, y: 1.0000006, z: 1}
+    - name: biker_fem:hand_l
+      parentName: biker_fem:lowerarm_l
+      position: {x: 0.00002781063, y: 0.0025005485, z: -0.000017366361}
+      rotation: {x: 0.116468996, y: 0.9033827, z: 0.023683246, w: 0.41203627}
+      scale: {x: 0.9999994, y: 1, z: 1}
+    - name: biker_fem:middle_metacarpal_l
+      parentName: biker_fem:hand_l
+      position: {x: 0.0000052367873, y: 0.00028337192, z: 0.000032690354}
+      rotation: {x: 0.036345687, y: -0.005847122, z: -0.08121376, w: 0.9960166}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:middle_01_l
+      parentName: biker_fem:middle_metacarpal_l
+      position: {x: 6.056258e-10, y: 0.00053810433, z: -7.552687e-10}
+      rotation: {x: 0.008906293, y: -0.00015760718, z: 0.021372404, w: 0.9997319}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:middle_02_l
+      parentName: biker_fem:middle_01_l
+      position: {x: -7.437328e-10, y: 0.00036099015, z: 9.327107e-10}
+      rotation: {x: 0.01583789, y: 0.00064769055, z: 0.020355754, w: 0.9996672}
+      scale: {x: 0.99999905, y: 1, z: 1}
+    - name: biker_fem:middle_03_l
+      parentName: biker_fem:middle_02_l
+      position: {x: 2.7799837e-10, y: 0.0002569828, z: -6.44623e-10}
+      rotation: {x: 0.19764712, y: -0.002474597, z: 0.23629212, w: 0.9513651}
+      scale: {x: 1, y: 1.0000007, z: 1}
+    - name: biker_fem:middle_03_l_end
+      parentName: biker_fem:middle_03_l
+      position: {x: -8.570928e-10, y: 0.00022939256, z: 7.19305e-10}
+      rotation: {x: 0, y: -0.00000062975477, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:pinky_metacarpal_l
+      parentName: biker_fem:hand_l
+      position: {x: -0.00010157846, y: 0.00028641353, z: -0.00014875455}
+      rotation: {x: -0.014419292, y: 0.16433904, z: -0.014701082, w: 0.98618895}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:pinky_01_l
+      parentName: biker_fem:pinky_metacarpal_l
+      position: {x: -3.230341e-10, y: 0.00042882736, z: 3.374571e-10}
+      rotation: {x: 0.03221785, y: 0.09310781, z: -0.0030427426, w: 0.99513}
+      scale: {x: 1, y: 0.99999946, z: 1}
+    - name: biker_fem:pinky_02_l
+      parentName: biker_fem:pinky_01_l
+      position: {x: -0.0000000013587653, y: 0.00036357125, z: -2.5469005e-10}
+      rotation: {x: 0.0066687996, y: 0.013324412, z: 0.0323741, w: 0.99936473}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:pinky_03_l
+      parentName: biker_fem:pinky_02_l
+      position: {x: 1.9369846e-10, y: 0.00024003393, z: -1.3100358e-10}
+      rotation: {x: -0.046530426, y: 0.09589467, z: 0.24674293, w: 0.96320146}
+      scale: {x: 1, y: 1.0000005, z: 1}
+    - name: biker_fem:pinky_03_l_end
+      parentName: biker_fem:pinky_03_l
+      position: {x: 7.152855e-10, y: 0.00029931864, z: 3.1730164e-11}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ring_metacarpal_l
+      parentName: biker_fem:hand_l
+      position: {x: -0.00004497633, y: 0.000289118, z: -0.0000611923}
+      rotation: {x: 0.020529717, y: 0.06687461, z: -0.070310436, w: 0.99506927}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ring_01_l
+      parentName: biker_fem:ring_metacarpal_l
+      position: {x: 0.0000000017192738, y: 0.00044880548, z: -3.4742842e-10}
+      rotation: {x: 0.004578522, y: 0.092598185, z: 0.022900965, w: 0.9954297}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ring_02_l
+      parentName: biker_fem:ring_01_l
+      position: {x: -6.5515515e-10, y: 0.00038979235, z: 3.5218234e-10}
+      rotation: {x: 0.026335329, y: -0.005568895, z: 0.026419673, w: 0.99928856}
+      scale: {x: 0.99999946, y: 1, z: 1}
+    - name: biker_fem:ring_03_l
+      parentName: biker_fem:ring_02_l
+      position: {x: 4.2491344e-13, y: 0.00027462086, z: -1.80415e-10}
+      rotation: {x: 0.16608346, y: 0.040063158, z: 0.42139232, w: 0.8906401}
+      scale: {x: 0.9999989, y: 1.0000007, z: 1}
+    - name: biker_fem:ring_03_l_end
+      parentName: biker_fem:ring_03_l
+      position: {x: 0.0000000013285529, y: 0.00021963382, z: -5.28131e-10}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:thumb_01_l
+      parentName: biker_fem:hand_l
+      position: {x: -0.0001579063, y: 0.00028178093, z: 0.00042962324}
+      rotation: {x: -0.34536943, y: 0.9089682, z: 0.013865397, w: -0.23303354}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:thumb_02_l
+      parentName: biker_fem:thumb_01_l
+      position: {x: 1.82931e-10, y: 0.00042099832, z: 8.1701285e-11}
+      rotation: {x: 0.03573086, y: 0.037125785, z: 0.0020931344, w: 0.9986695}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:thumb_03_l
+      parentName: biker_fem:thumb_02_l
+      position: {x: -4.4012569e-10, y: 0.0002463738, z: 2.6091931e-10}
+      rotation: {x: 0.014307695, y: -0.042193685, z: 0.022649983, w: 0.99875027}
+      scale: {x: 1, y: 0.9999994, z: 1}
+    - name: biker_fem:thumb_03_l_end
+      parentName: biker_fem:thumb_03_l
+      position: {x: 4.6918835e-10, y: 0.0002463724, z: 1.9944935e-10}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:index_metacarpal_l
+      parentName: biker_fem:hand_l
+      position: {x: 0.00005888542, y: 0.00031432314, z: 0.0001772139}
+      rotation: {x: 0.06703357, y: -0.18927328, z: -0.0948345, w: 0.9750326}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:index_01_l
+      parentName: biker_fem:index_metacarpal_l
+      position: {x: -0.0000000010195367, y: 0.00049038813, z: -9.003227e-12}
+      rotation: {x: -0.003398877, y: 0.07866449, z: 0.028945193, w: 0.9964751}
+      scale: {x: 1, y: 0.9999994, z: 1}
+    - name: biker_fem:index_02_l
+      parentName: biker_fem:index_01_l
+      position: {x: -2.0354298e-11, y: 0.00037418818, z: 5.1021515e-10}
+      rotation: {x: 0.012293304, y: -0.09500402, z: 0.012015017, w: 0.9953285}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:index_03_l
+      parentName: biker_fem:index_02_l
+      position: {x: 9.725054e-11, y: 0.0002817484, z: -0.0000000023260012}
+      rotation: {x: 0.20533085, y: -0.03507085, z: 0.22967902, w: 0.9507139}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:index_03_l_end
+      parentName: biker_fem:index_03_l
+      position: {x: 4.504499e-10, y: 0.00026213235, z: -2.470033e-10}
+      rotation: {x: 0, y: -0, z: -0.00000055353337, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:clavicle_r
+      parentName: biker_fem:spine_05
+      position: {x: -0.00010048054, y: 0.0005830902, z: -0.000093135735}
+      rotation: {x: 0.014497977, y: 0.70838696, z: -0.6923598, w: -0.13643909}
+      scale: {x: 0.99999934, y: 1, z: 0.9999994}
+    - name: biker_fem:upperarm_r
+      parentName: biker_fem:clavicle_r
+      position: {x: -1.1681714e-10, y: 0.0013861291, z: 3.40667e-10}
+      rotation: {x: 0.07293998, y: -0.49826112, z: 0.090982735, w: 0.8591495}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:lowerarm_r
+      parentName: biker_fem:upperarm_r
+      position: {x: -0.00005323798, y: 0.0023865593, z: 0.000032528085}
+      rotation: {x: -0.008864721, y: -0.51429147, z: -0.007749429, w: 0.8575347}
+      scale: {x: 1, y: 1, z: 0.9999994}
+    - name: biker_fem:hand_r
+      parentName: biker_fem:lowerarm_r
+      position: {x: -0.000027838529, y: 0.002500435, z: -0.000017374483}
+      rotation: {x: 0.082141615, y: -0.7250107, z: 0.12802649, w: 0.6717303}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:middle_metacarpal_r
+      parentName: biker_fem:hand_r
+      position: {x: -0.00000532459, y: 0.00028334896, z: 0.000032679127}
+      rotation: {x: 0.028949142, y: -0.08515242, z: 0.070808165, w: 0.99342704}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:middle_01_r
+      parentName: biker_fem:middle_metacarpal_r
+      position: {x: -4.562428e-10, y: 0.0005381046, z: -3.560147e-10}
+      rotation: {x: 0.006584935, y: 0.123497516, z: -0.017095271, w: 0.99217576}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:middle_02_r
+      parentName: biker_fem:middle_01_r
+      position: {x: 6.561133e-10, y: 0.00036099087, z: 6.209589e-10}
+      rotation: {x: 0.02041525, y: 0.036515623, z: -0.028359806, w: 0.99872196}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:middle_03_r
+      parentName: biker_fem:middle_02_r
+      position: {x: 2.713777e-10, y: 0.00025698374, z: 0.000000001263585}
+      rotation: {x: 0.16600364, y: 0.010158471, z: -0.19544822, w: 0.966509}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:middle_03_r_end
+      parentName: biker_fem:middle_03_r
+      position: {x: -3.746549e-10, y: 0.00022939101, z: -5.408707e-10}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:pinky_metacarpal_r
+      parentName: biker_fem:hand_r
+      position: {x: 0.000101462836, y: 0.00028644456, z: -0.00014877884}
+      rotation: {x: -0.014414539, y: -0.16431725, z: 0.014810079, w: 0.98619103}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:pinky_01_r
+      parentName: biker_fem:pinky_metacarpal_r
+      position: {x: 1.1077311e-11, y: 0.00042882885, z: 4.8496895e-10}
+      rotation: {x: 0.031100966, y: -0.117942356, z: 0.01738995, w: 0.992381}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:pinky_02_r
+      parentName: biker_fem:pinky_01_r
+      position: {x: -3.1236466e-10, y: 0.00036357244, z: -1.458356e-10}
+      rotation: {x: 0.0053377594, y: -0.039496776, z: -0.029855862, w: 0.99875927}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:pinky_03_r
+      parentName: biker_fem:pinky_02_r
+      position: {x: 8.585698e-10, y: 0.00024003342, z: 3.7392708e-10}
+      rotation: {x: -0.023049721, y: -0.011447705, z: -0.16018009, w: 0.9867523}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:pinky_03_r_end
+      parentName: biker_fem:pinky_03_r
+      position: {x: -6.389991e-10, y: 0.00029931872, z: 1.5546507e-10}
+      rotation: {x: 0.000000583481, y: -4.9575296e-13, z: -0.00000084964717, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ring_metacarpal_r
+      parentName: biker_fem:hand_r
+      position: {x: 0.000044871602, y: 0.00028909137, z: -0.00006119708}
+      rotation: {x: 0.020502143, y: -0.06686948, z: 0.07045974, w: 0.9950596}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ring_01_r
+      parentName: biker_fem:ring_metacarpal_r
+      position: {x: 0.0000000016030773, y: 0.00044880575, z: 6.775914e-10}
+      rotation: {x: 0.00049133366, y: -0.037254117, z: -0.023990285, w: 0.9990178}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ring_02_r
+      parentName: biker_fem:ring_01_r
+      position: {x: 4.0156337e-11, y: 0.00038979284, z: -5.5606957e-11}
+      rotation: {x: 0.026331782, y: 0.005577384, z: -0.026422836, w: 0.99928844}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ring_03_r
+      parentName: biker_fem:ring_02_r
+      position: {x: 8.7119045e-12, y: 0.00027462223, z: 3.6365297e-10}
+      rotation: {x: 0.042250257, y: 0.04881276, z: -0.14936042, w: 0.98667306}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ring_03_r_end
+      parentName: biker_fem:ring_03_r
+      position: {x: -1.283154e-10, y: 0.00021963324, z: -8.6121605e-12}
+      rotation: {x: 0.0000009500037, y: -0.0000011034598, z: 1.0482909e-12, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:thumb_01_r
+      parentName: biker_fem:hand_r
+      position: {x: 0.00015780082, y: 0.00028174615, z: 0.00042964207}
+      rotation: {x: 0.11520344, y: 0.92066914, z: -0.25657108, w: 0.27068025}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:thumb_02_r
+      parentName: biker_fem:thumb_01_r
+      position: {x: -0.0000000012366339, y: 0.00042099736, z: -1.7796408e-11}
+      rotation: {x: 0.033299178, y: -0.35941795, z: 0.0016714174, w: 0.93258095}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:thumb_03_r
+      parentName: biker_fem:thumb_02_r
+      position: {x: 1.4741247e-10, y: 0.00024637464, z: 6.127672e-10}
+      rotation: {x: 0.011057069, y: 0.023958154, z: -0.02726188, w: 0.99928}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:thumb_03_r_end
+      parentName: biker_fem:thumb_03_r
+      position: {x: -2.691249e-10, y: 0.00024637132, z: -3.042845e-11}
+      rotation: {x: 0.00000057035385, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:index_metacarpal_r
+      parentName: biker_fem:hand_r
+      position: {x: -0.000058942078, y: 0.00031424753, z: 0.00017723258}
+      rotation: {x: 0.04697597, y: 0.049479686, z: 0.087208614, w: 0.99385095}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:index_01_r
+      parentName: biker_fem:index_metacarpal_r
+      position: {x: 5.0097043e-10, y: 0.00049038767, z: 7.359599e-10}
+      rotation: {x: 0.005121426, y: 0.13216996, z: -0.02607927, w: 0.9908707}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:index_02_r
+      parentName: biker_fem:index_01_r
+      position: {x: -6.1302663e-10, y: 0.00037418894, z: -5.2977156e-10}
+      rotation: {x: 0.019590791, y: 0.08501624, z: -0.018450802, w: 0.99601614}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:index_03_r
+      parentName: biker_fem:index_02_r
+      position: {x: -3.0366476e-10, y: 0.00028174862, z: 7.2640854e-10}
+      rotation: {x: 0.1698285, y: 0.033333488, z: -0.19516182, w: 0.96538025}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:index_03_r_end
+      parentName: biker_fem:index_03_r
+      position: {x: -4.9389007e-11, y: 0.00026213165, z: -5.0351456e-10}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:thigh_l
+      parentName: biker_fem:pelvis
+      position: {x: 0.00013756558, y: -0.00033159505, z: 0.00081396906}
+      rotation: {x: 0.9904098, y: -0.04694722, z: 0.071383856, w: 0.108576074}
+      scale: {x: 1.0000029, y: 1, z: 1.0000023}
+    - name: biker_fem:calf_l
+      parentName: biker_fem:thigh_l
+      position: {x: -0.00031528994, y: 0.0041169245, z: 0.000100969686}
+      rotation: {x: -0.025893208, y: -0.09399879, z: 0.2086313, w: 0.9731222}
+      scale: {x: 1, y: 0.99999934, z: 1}
+    - name: biker_fem:foot_l
+      parentName: biker_fem:calf_l
+      position: {x: 0.00023678924, y: 0.004924304, z: 0.00013640353}
+      rotation: {x: 0.7904486, y: 0.607492, z: 0.07838272, w: -0.0007945995}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:foot_l_end
+      parentName: biker_fem:foot_l
+      position: {x: 4.744299e-10, y: 0.0015115797, z: -0.000000009523403}
+      rotation: {x: 0.0000880013, y: -0.0028404964, z: -0.01897646, w: 0.9998159}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:thigh_r
+      parentName: biker_fem:pelvis
+      position: {x: 0.00013763066, y: -0.00033143576, z: -0.0008139571}
+      rotation: {x: 0.08749361, y: -0.010295645, z: 0.9922513, w: 0.08761464}
+      scale: {x: 1.0000024, y: 1, z: 1.0000024}
+    - name: biker_fem:calf_r
+      parentName: biker_fem:thigh_r
+      position: {x: 0.00031528607, y: 0.0041170446, z: 0.000100954836}
+      rotation: {x: -0.019268295, y: 0.008565456, z: -0.09822613, w: 0.9949407}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:foot_r
+      parentName: biker_fem:calf_r
+      position: {x: -0.00023677759, y: 0.0049242685, z: 0.0001364197}
+      rotation: {x: 0.75621545, y: -0.65186024, z: -0.00571457, w: -0.056425184}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:foot_r_end
+      parentName: biker_fem:foot_r
+      position: {x: 5.2633113e-11, y: 0.0015115793, z: -0.000000010231077}
+      rotation: {x: 0.0002374577, y: 0.0075646914, z: 0.050534684, w: 0.99869365}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ik_hand_root
+      parentName: Anim1st1loop(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ik_hand_l
+      parentName: biker_fem:ik_hand_root
+      position: {x: -0.0041230884, y: 0.010192594, z: -0.00008932461}
+      rotation: {x: -0.123410925, y: 0.130861, z: 0.53104144, w: 0.828034}
+      scale: {x: 0.99999994, y: 0.99999994, z: 0.9999999}
+    - name: biker_fem:ik_hand_l_end
+      parentName: biker_fem:ik_hand_l
+      position: {x: -0, y: 0.004140619, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:ik_hand_r
+      parentName: biker_fem:ik_hand_root
+      position: {x: 0.004122989, y: 0.010192673, z: -0.00008934282}
+      rotation: {x: -0.12341098, y: -0.13086101, z: -0.5310415, w: 0.82803386}
+      scale: {x: 0.99999994, y: 1, z: 0.9999999}
+    - name: biker_fem:ik_hand_r_end
+      parentName: biker_fem:ik_hand_r
+      position: {x: -0, y: 0.004140619, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:interaction
+      parentName: Anim1st1loop(Clone)
+      position: {x: 1.7763568e-19, y: 1.8735012e-20, z: 3.5527136e-19}
+      rotation: {x: 6.3312404e-19, y: 2.5275461e-17, z: 1.3877775e-17, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:interaction_end
+      parentName: biker_fem:interaction
+      position: {x: -0, y: 0.0001, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:center_of_mass
+      parentName: Anim1st1loop(Clone)
+      position: {x: 1.7763568e-19, y: 1.8735012e-20, z: 3.5527136e-19}
+      rotation: {x: 6.3312404e-19, y: 2.5275461e-17, z: 1.3877775e-17, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: biker_fem:center_of_mass_end
+      parentName: biker_fem:center_of_mass
+      position: {x: -0, y: 0.0001, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 3
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
