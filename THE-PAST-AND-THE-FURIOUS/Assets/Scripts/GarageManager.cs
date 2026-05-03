@@ -43,7 +43,12 @@ public class GarageManager : MonoBehaviour
     [Tooltip("The main camera in the garage scene")]
     public Camera garageCamera;
     public float cameraMoveSpeed = 5f;
-    public float cameraRotateSpeed = 5f;
+    
+
+    [Tooltip("Cameras to cycle between via the top arrows in the garage UI (left = previous, right = next). Only one is active at a time.")]
+    public Camera[] carCameras;
+    private int selectedCameraIndex = 0;
+public float cameraRotateSpeed = 5f;
 
     [Header("UI")]
     public TextMeshProUGUI carNameText;
@@ -65,8 +70,9 @@ public class GarageManager : MonoBehaviour
         // Self-wire buttons by name
         WireButton("PrevCarButton", PreviousCar);
         WireButton("NextCarButton", NextCar);
-        WireButton("PrevDriverButton", PreviousDriver);
-        WireButton("NextDriverButton", NextDriver);
+        // Driver arrows now control camera (car) selection — the driver concept is unused in the garage UI.
+        WireButton("PrevDriverButton", PreviousCamera);
+        WireButton("NextDriverButton", NextCamera);
         WireButton("RaceButton", ConfirmAndRace);
         WireButton("BackButton", BackToMenu);
 
@@ -78,6 +84,7 @@ public class GarageManager : MonoBehaviour
         UpdateUI();
         UpdateDisplayModels();
         SnapCameraToCurrentCar();
+        UpdateCameraSelection();
     }
 
     void WireButton(string name, UnityEngine.Events.UnityAction action)
@@ -184,7 +191,34 @@ public class GarageManager : MonoBehaviour
         MoveCameraToCurrentCar();
     }
 
-    // --- Confirm & Race ---
+    // --- Camera Switching ---
+    public void NextCamera()
+    {
+        if (carCameras == null || carCameras.Length == 0) return;
+        selectedCameraIndex = (selectedCameraIndex + 1) % carCameras.Length;
+        UpdateCameraSelection();
+    }
+
+    public void PreviousCamera()
+    {
+        if (carCameras == null || carCameras.Length == 0) return;
+        selectedCameraIndex--;
+        if (selectedCameraIndex < 0) selectedCameraIndex = carCameras.Length - 1;
+        UpdateCameraSelection();
+    }
+
+    void UpdateCameraSelection()
+    {
+        if (carCameras == null) return;
+        for (int i = 0; i < carCameras.Length; i++)
+        {
+            if (carCameras[i] != null)
+                carCameras[i].gameObject.SetActive(i == selectedCameraIndex);
+        }
+    }
+
+    
+// --- Confirm & Race ---
     public void ConfirmAndRace()
     {
         if (cars == null || cars.Length == 0)
