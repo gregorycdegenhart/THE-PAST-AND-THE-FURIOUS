@@ -11,6 +11,15 @@ public class SpeedometerNeedle : MonoBehaviour
     public float minAngle = 120f;   // Angle at 0 MPH
     public float maxAngle = -120f;  // Angle at max MPH
 
+    void Start()
+    {
+        if (carRigidbody == null)
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player != null) carRigidbody = player.GetComponent<Rigidbody>() ?? player.GetComponentInChildren<Rigidbody>();
+        }
+    }
+
     void Update()
     {
         if (carRigidbody == null) return;

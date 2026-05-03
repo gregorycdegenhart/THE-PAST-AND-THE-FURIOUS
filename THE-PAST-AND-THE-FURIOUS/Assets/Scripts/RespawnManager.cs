@@ -34,10 +34,27 @@ public class RespawnManager : MonoBehaviour
 
         if (fadeGroup != null)
             fadeGroup.alpha = 0f;
+
+        if (carController == null || carRigidbody == null || carTransform == null || playerInput == null)
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player != null)
+            {
+                if (carController == null) carController = player.GetComponent<CarController>() ?? player.GetComponentInChildren<CarController>();
+                if (carRigidbody == null) carRigidbody = player.GetComponent<Rigidbody>() ?? player.GetComponentInChildren<Rigidbody>();
+                if (carTransform == null) carTransform = player.transform;
+                if (playerInput == null) playerInput = player.GetComponent<PlayerInput>() ?? player.GetComponentInChildren<PlayerInput>();
+            }
+        }
     }
 
     void Start()
     {
+        if (carTransform == null)
+        {
+            Debug.LogError("[RespawnManager] carTransform still null in Start — no Player-tagged GameObject in scene.");
+            return;
+        }
         defaultSpawnPosition = carTransform.position;
         defaultSpawnRotation = carTransform.rotation;
     }

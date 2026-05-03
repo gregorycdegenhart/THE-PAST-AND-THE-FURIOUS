@@ -72,7 +72,19 @@ public class RaceManager : MonoBehaviour
             if (go != null) lapText = go.GetComponent<TMPro.TextMeshProUGUI>();
         }
 
+        AutoFindPlayerRefs();
         UpdateLapUI();
+    }
+
+    void AutoFindPlayerRefs()
+    {
+        if (carController != null && carRigidbody != null && carTransform != null && playerInput != null) return;
+        var player = GameObject.FindWithTag("Player");
+        if (player == null) return;
+        if (carController == null) carController = player.GetComponent<CarController>() ?? player.GetComponentInChildren<CarController>();
+        if (carRigidbody == null) carRigidbody = player.GetComponent<Rigidbody>() ?? player.GetComponentInChildren<Rigidbody>();
+        if (carTransform == null) carTransform = player.transform;
+        if (playerInput == null) playerInput = player.GetComponent<PlayerInput>() ?? player.GetComponentInChildren<PlayerInput>();
     }
 
     public static RaceManager Instance { get; private set; }

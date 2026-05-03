@@ -18,9 +18,6 @@ public class LapCheckpoint : MonoBehaviour
 
             RaceManager.Instance.HitCheckpoint(checkpointIndex, completesLap);
             RespawnManager.Instance?.UpdateLastCheckpoint(transform, other.transform.root.rotation);
-
-            CarAudio carAudio = other.GetComponentInParent<CarAudio>();
-            if (carAudio != null) carAudio.PlayCheckpointSound();
         }
     }
 }
