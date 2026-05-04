@@ -21,6 +21,9 @@ public class CarSpawner : MonoBehaviour
     [Tooltip("If true, disable any Light components on objects named '*Headlight*' after spawning. Use for daytime maps.")]
     public bool disableHeadlights = false;
 
+    [Tooltip("Optional VFX (rain, snow, etc.) instantiated as a child of the spawned player car. Local-space particle systems work best so the effect follows the car.")]
+    public GameObject vfxPrefab;
+
     void Awake()
     {
         int idx = PlayerPrefs.GetInt("SelectedCarColor", defaultIndex);
@@ -44,6 +47,14 @@ public class CarSpawner : MonoBehaviour
             foreach (var lt in car.GetComponentsInChildren<Light>(true))
                 if (lt.gameObject.name.IndexOf("Headlight", System.StringComparison.OrdinalIgnoreCase) >= 0)
                     lt.enabled = false;
+
+        if (vfxPrefab != null)
+        {
+            // Preserve the prefab's authored local position/rotation so e.g. a rain box positioned
+            // 10m above stays above the car. InstantiatePrefab-with-parent uses the prefab's local
+            // transform by default (worldPositionStays = false), which is what we want.
+            Instantiate(vfxPrefab, car.transform);
+        }
 
         var aiSpawner = FindFirstObjectByType<AIRaceGridSpawner>();
         if (aiSpawner != null)

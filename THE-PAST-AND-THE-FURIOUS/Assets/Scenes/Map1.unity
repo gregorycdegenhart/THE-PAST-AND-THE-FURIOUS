@@ -2486,6 +2486,12 @@ MonoBehaviour:
   raceType: 0
   totalLaps: 3
   disableHeadlights: 1
+  aiPassableNamePrefixes:
+  - Cone
+  - Barricade
+  - WoodBarricade
+  - StoneBarricade
+  - CarCrash
   logSpawns: 1
 --- !u!4 &429138702
 Transform:
@@ -3513,6 +3519,7 @@ MonoBehaviour:
   spawnPoint: {fileID: 0}
   defaultIndex: 0
   disableHeadlights: 1
+  vfxPrefab: {fileID: 0}
 --- !u!4 &575670235
 Transform:
   m_ObjectHideFlags: 0
@@ -4698,7 +4705,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -322, y: 112.600006}
+  m_AnchoredPosition: {x: -331.7, y: 112.600006}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &899142835
@@ -4789,7 +4796,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -24.973457, y: -7.886345, z: 127.93389, w: -21.03023}
+  m_margin: {x: -24.973457, y: -7.886345, z: 115.930084, w: -21.03023}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -9533,7 +9540,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 1912.924, y: 899.6726, z: 20.038036, w: 84.81741}
+  m_margin: {x: 1895.7072, y: 899.6726, z: -7.691334, w: 84.81741}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

@@ -177,6 +177,15 @@ public class RaceManager : MonoBehaviour
 
     private IEnumerator FinishRace()
     {
+        // Lock in the placement at the EXACT moment the player crosses the line. Any AI
+        // that finishes during the coast-out / fade no longer affects the saved position.
+        // (Setting raceFinished AFTER this — also at the same instant — locks in the time
+        // for the same reason: RaceTimer reads IsRaceFinished and saves on the next frame.)
+        int finalPos = aiFinishCount + 1;
+        PlayerPrefs.SetInt("FinalPosition", finalPos);
+        PlayerPrefs.SetInt("FinalPosition_" + SceneManager.GetActiveScene().name, finalPos);
+        PlayerPrefs.Save();
+
         raceFinished = true;
 
         // disable player input
@@ -196,12 +205,6 @@ public class RaceManager : MonoBehaviour
 
         if (delayBeforeFade > 0f)
             yield return new WaitForSecondsRealtime(delayBeforeFade);
-
-        // Persist the player's finishing position so the WinScene can show it on the podium.
-        // Global key = latest race; per-scene key = used by the final win screen to summarize all 3 maps.
-        int finalPos = aiFinishCount + 1;
-        PlayerPrefs.SetInt("FinalPosition", finalPos);
-        PlayerPrefs.SetInt("FinalPosition_" + SceneManager.GetActiveScene().name, finalPos);
 
         // Fade to black before loading the next scene
         if (fadeGroup != null)
@@ -268,8 +271,8 @@ public class RaceManager : MonoBehaviour
     {
         if (lapText == null) return;
         if (raceType == RaceType.Checkpoints)
-            lapText.text = "Checkpoint " + currentCheckpoint + " / " + (finalCheckpointIndex + 1);
+            lapText.text = "Checkpoint " + Mathf.Min(currentCheckpoint, finalCheckpointIndex + 1) + " / " + (finalCheckpointIndex + 1);
         else
-            lapText.text = "Lap " + currentLap + " / " + totalLaps;
+            lapText.text = "Lap " + Mathf.Min(currentLap, totalLaps) + " / " + totalLaps;
     }
 }

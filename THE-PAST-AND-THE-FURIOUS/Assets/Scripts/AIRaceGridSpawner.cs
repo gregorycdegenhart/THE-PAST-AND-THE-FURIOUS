@@ -97,6 +97,10 @@ public class AIRaceGridSpawner : MonoBehaviour
     [Tooltip("If true, disable any Light components on objects named '*Headlight*' on each spawned AI. Use for daytime maps.")]
     public bool disableHeadlights = false;
 
+    [Header("AI-passable obstacles")]
+    [Tooltip("Each AI ignores physics collision with objects whose name starts with any of these prefixes (case-insensitive). The player still collides with them. Useful for cones/barricades that should only obstruct the player.")]
+    public string[] aiPassableNamePrefixes = { "Cone", "Barricade", "WoodBarricade", "StoneBarricade", "CarCrash" };
+
     [Header("Debug")]
     public bool logSpawns = true;
 
@@ -200,6 +204,7 @@ public class AIRaceGridSpawner : MonoBehaviour
 
                     IgnorePhysicalCollisionWithPlayer(ai);
                     IgnoreCollisionWithOtherAI(ai);
+                    IgnoreCollisionWithObstacles(ai);
 
                     // Pin the rotation as the very last spawn step. Setting rotation earlier
                     // (before PlaceAIOnGround / activation) can let physics or rigidbody init
@@ -384,6 +389,51 @@ public class AIRaceGridSpawner : MonoBehaviour
     /// physics impulses — exactly what we want now that all AI are dynamic rigidbodies.
     /// Soft separation in AICarController.ApplySeparationVelocity still spreads them apart visually.
     /// </summary>
+    /// <summary>
+    /// Disable collision between this AI and every scene object whose name starts with one of
+    /// the prefixes in `aiPassableNamePrefixes` (cones, barricades, etc). The player still
+    /// collides normally — IgnoreCollision is per-collider-pair and only the AI's pairs are
+    /// touched here.
+    /// </summary>
+    void IgnoreCollisionWithObstacles(GameObject ai)
+    {
+        if (aiPassableNamePrefixes == null || aiPassableNamePrefixes.Length == 0) return;
+        Collider[] aiColliders = ai.GetComponentsInChildren<Collider>(includeInactive: true);
+        if (aiColliders.Length == 0) return;
+
+        int matchedObjects = 0;
+        // Iterate every scene Collider once. Faster than walking every Transform and pulling
+        // their colliders, since most non-obstacle scene objects don't have colliders.
+        Collider[] all = FindObjectsByType<Collider>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (Collider oc in all)
+        {
+            if (oc == null || oc.isTrigger) continue;
+            // Skip cars (they have rigidbodies; already handled by the player/other-AI ignores).
+            if (oc.attachedRigidbody != null) continue;
+
+            string objName = oc.transform.root.name;
+            bool matches = false;
+            for (int i = 0; i < aiPassableNamePrefixes.Length; i++)
+            {
+                var prefix = aiPassableNamePrefixes[i];
+                if (string.IsNullOrEmpty(prefix)) continue;
+                if (objName.StartsWith(prefix, System.StringComparison.OrdinalIgnoreCase)) { matches = true; break; }
+                // Also match nested colliders (the prefix appears in any ancestor name).
+                if (oc.gameObject.name.StartsWith(prefix, System.StringComparison.OrdinalIgnoreCase)) { matches = true; break; }
+            }
+            if (!matches) continue;
+
+            matchedObjects++;
+            for (int i = 0; i < aiColliders.Length; i++)
+            {
+                Collider ac = aiColliders[i];
+                if (ac == null || ac.isTrigger) continue;
+                Physics.IgnoreCollision(ac, oc, true);
+            }
+        }
+        if (logSpawns && matchedObjects > 0) Debug.Log($"[AIRaceGridSpawner] {ai.name}: ignored collision with {matchedObjects} obstacle colliders");
+    }
+
     void IgnoreCollisionWithOtherAI(GameObject newAI)
     {
         Collider[] newColliders = newAI.GetComponentsInChildren<Collider>(includeInactive: true);

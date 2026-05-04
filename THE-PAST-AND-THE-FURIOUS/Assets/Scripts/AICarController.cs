@@ -87,6 +87,22 @@ public class AICarController : MonoBehaviour
     [Tooltip("Layers that count as ground for slope-assist + grounding checks. Should include Terrain and Default.")]
     public LayerMask groundMask = ~0;
 
+    [Header("Obstacle Avoidance")]
+    [Tooltip("Base distance ahead the AI casts for obstacles. Scaled by speed at runtime.")]
+    public float obstacleAvoidanceDistance = 10f;
+
+    [Tooltip("Sideways angle (degrees) of the left/right avoidance rays.")]
+    public float obstacleAvoidanceSideAngle = 22f;
+
+    [Tooltip("How strongly to bias steering away from obstacles (added to base steer input). 0 = off.")]
+    public float obstacleAvoidanceStrength = 1.2f;
+
+    [Tooltip("Speed multiplier applied when something is dead ahead. Prevents plowing at full speed into a barrier.")]
+    [Range(0.1f, 1f)] public float obstacleSlowMultiplier = 0.55f;
+
+    [Tooltip("Surfaces with a normal dot-up greater than this are treated as the road/ground and ignored by avoidance. 0.7 ≈ ramps up to ~45° still count as ground.")]
+    [Range(0f, 1f)] public float groundNormalThreshold = 0.7f;
+
     [Header("Out-of-Bounds Respawn")]
     [Tooltip("If true, the AI auto-teleports back onto the racing line when it falls off the map (Y too far below the next waypoint, or horizontal distance too far from it).")]
     public bool autoRespawnIfFallenOff = true;
@@ -106,6 +122,12 @@ public class AICarController : MonoBehaviour
     [Tooltip("Grace period (seconds) after the race starts before stuck/fall-off detection runs. Gives the AI time to accelerate from 0 and clear the start grid. If teleports are firing right after countdown, raise this.")]
     public float stuckGraceAfterRaceStart = 4f;
 
+    [Tooltip("Seconds airborne (no ground beneath) before the AI gets teleported to the next waypoint. Catches cars that launch off ramps or edges.")]
+    public float airborneTimeout = 0.5f;
+
+    [Tooltip("Downward raycast distance for the airborne check. Should be larger than the tallest legitimate jump landing.")]
+    public float airborneRaycastDistance = 4f;
+
     [Tooltip("Seconds of barely-moving (less than ~1 m/s) after grace before the AI is declared stuck and teleported to the next waypoint. Lower = more aggressive recovery. Raise if AI is teleporting when they're actually just slow.")]
     public float stuckTimeout = 1.5f;
 
@@ -123,6 +145,7 @@ public class AICarController : MonoBehaviour
     // AI can't get pinned against a wall, an upside-down landing, or another AI for long.
     private Vector3 lastProgressPosition;
     private float stuckTimer = 0f;
+    private float airborneTimer = 0f;
     private const float STUCK_MIN_DISTANCE_PER_SECOND = 1.0f;
 
     private bool isTurboActive = false;
@@ -242,6 +265,31 @@ public class AICarController : MonoBehaviour
             return;
         }
 
+        // Airborne check: if no ground is beneath us for `airborneTimeout` seconds, advance to
+        // the next waypoint and teleport there. Catches cars that launched off a ramp or edge.
+        if (Time.time - raceStartTimestamp >= stuckGraceAfterRaceStart
+            && Time.time - lastRespawnTime > respawnCooldown)
+        {
+            bool grounded = Physics.Raycast(rb.position + Vector3.up * 0.5f, Vector3.down,
+                airborneRaycastDistance + 0.5f, groundMask, QueryTriggerInteraction.Ignore);
+            if (!grounded)
+            {
+                airborneTimer += Time.fixedDeltaTime;
+                if (airborneTimer >= airborneTimeout)
+                {
+                    if (logTeleports) Debug.Log($"[AI {name}] Teleporting (AIRBORNE) — no ground for {airborneTimer:F2}s");
+                    airborneTimer = 0f;
+                    AdvanceWaypoint();
+                    RespawnAtCurrentWaypoint();
+                    return;
+                }
+            }
+            else
+            {
+                airborneTimer = 0f;
+            }
+        }
+
         Transform targetWaypoint = waypointPath.GetWaypoint(currentWaypointIndex);
         if (targetWaypoint == null) return;
 
@@ -254,10 +302,13 @@ public class AICarController : MonoBehaviour
 
         float angleToTarget = Vector3.SignedAngle(transform.forward, dirToTarget, Vector3.up);
 
+        // --- Obstacle avoidance (raycasts ahead) ---
+        ComputeObstacleAvoidance(out float avoidSteer, out float avoidSpeedMul);
+
         // --- Steering ---
         float noiseTime = Time.time * steerNoiseSpeed;
         float steerNoise = (Mathf.PerlinNoise(noiseTime + noiseOffsetX, noiseTime + noiseOffsetZ) - 0.5f) * 2f * steerNoiseAmount;
-        float steerInput = Mathf.Clamp(angleToTarget / 45f + steerNoise, -1f, 1f);
+        float steerInput = Mathf.Clamp(angleToTarget / 45f + steerNoise + avoidSteer, -1f, 1f);
 
         float turnAmount = steerInput * turnSpeed * Time.fixedDeltaTime;
         rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, turnAmount, 0f));
@@ -281,6 +332,7 @@ public class AICarController : MonoBehaviour
         float rubber = GetRubberBandMultiplier();
         targetSpeed *= rubber;
         targetSpeed *= externalSpeedMultiplier;
+        targetSpeed *= avoidSpeedMul;
 
         // Don't fire a new turbo while steering through a HAIRPIN — gentle corners are fine.
         // (gentleCornerAngle is now low enough that almost every stretch of track counts as a
@@ -355,6 +407,60 @@ public class AICarController : MonoBehaviour
         Vector3 force = velError * rb.mass / Time.fixedDeltaTime;
         force = Vector3.ClampMagnitude(force, accelerationForceMax * rb.mass);
         rb.AddForce(force, ForceMode.Force);
+    }
+
+    /// <summary>
+    /// Casts three rays — center, left at -sideAngle, right at +sideAngle — to detect static
+    /// obstacles (barricades, walls, signs). Outputs a steer adjustment biasing away from
+    /// hits, and a speed multiplier that slows the car if an obstacle is dead ahead.
+    /// Skips other Rigidbodies (cars), triggers (checkpoints, OOB volumes), and the road
+    /// surface itself (any hit whose normal mostly points up).
+    /// </summary>
+    private void ComputeObstacleAvoidance(out float steerAdjust, out float speedMul)
+    {
+        steerAdjust = 0f;
+        speedMul = 1f;
+        if (obstacleAvoidanceStrength <= 0f) return;
+
+        float castDist = obstacleAvoidanceDistance + Mathf.Max(0f, currentSpeed) * 0.3f;
+        Vector3 origin = rb.position + Vector3.up * 0.5f;
+        Vector3 fwd = transform.forward;
+        Vector3 leftDir = Quaternion.Euler(0f, -obstacleAvoidanceSideAngle, 0f) * fwd;
+        Vector3 rightDir = Quaternion.Euler(0f, obstacleAvoidanceSideAngle, 0f) * fwd;
+
+        bool centerHit = ObstacleHit(origin, fwd, castDist);
+        bool leftHit = ObstacleHit(origin, leftDir, castDist);
+        bool rightHit = ObstacleHit(origin, rightDir, castDist);
+
+        if (centerHit)
+        {
+            speedMul = obstacleSlowMultiplier;
+            if (leftHit && !rightHit) steerAdjust = obstacleAvoidanceStrength;       // turn right
+            else if (rightHit && !leftHit) steerAdjust = -obstacleAvoidanceStrength; // turn left
+            else steerAdjust = obstacleAvoidanceStrength * 0.7f;                     // both/neither: bias right
+        }
+        else if (leftHit)
+        {
+            steerAdjust = obstacleAvoidanceStrength * 0.5f;
+        }
+        else if (rightHit)
+        {
+            steerAdjust = -obstacleAvoidanceStrength * 0.5f;
+        }
+    }
+
+    private bool ObstacleHit(Vector3 origin, Vector3 dir, float dist)
+    {
+        var hits = Physics.RaycastAll(origin, dir, dist, ~0, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            var h = hits[i];
+            if (h.collider == null) continue;
+            if (h.collider.attachedRigidbody != null) continue;          // skip cars / dynamic bodies
+            if (Vector3.Dot(h.normal, Vector3.up) > groundNormalThreshold) continue; // skip the road
+            return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -577,6 +683,11 @@ public class AICarController : MonoBehaviour
     {
         if (allAICars == null) return;
 
+        // Brief grace after teleport: skip separation so a freshly respawned AI doesn't get
+        // catapulted by a sibling sitting near the same waypoint. Without this, overlap × strength
+        // produces hundreds of m/s of sideways velocity and the car flies off in a random direction.
+        if (Time.time - lastRespawnTime < respawnCooldown) return;
+
         Vector3 forwardFlat = transform.forward;
         forwardFlat.y = 0f;
         forwardFlat.Normalize();
@@ -605,6 +716,12 @@ public class AICarController : MonoBehaviour
         }
 
         if (separationVel.sqrMagnitude < 0.0001f) return;
+
+        // Cap the per-frame separation push so two cars stacking on the same waypoint can't
+        // launch each other across the map. 8 m/s is a strong nudge, well shy of slingshot.
+        const float MAX_SEP_VEL = 8f;
+        if (separationVel.sqrMagnitude > MAX_SEP_VEL * MAX_SEP_VEL)
+            separationVel = separationVel.normalized * MAX_SEP_VEL;
 
         Vector3 v = rb.linearVelocity;
         v.x += separationVel.x;

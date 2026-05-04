@@ -99,25 +99,45 @@ public class PlayerWrongWayDetector : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Finds the waypoint segment closest to the player (by perpendicular distance to the
+    /// segment line, not just to a waypoint), and returns that segment's direction.
+    /// More robust than picking the nearest single waypoint — when the player is mid-segment,
+    /// the nearest-waypoint approach can return a direction that points OFF the road and
+    /// produces false wrong-way readings on twisty tracks.
+    /// </summary>
     private Vector3 GetPathDirectionAtPlayer()
     {
-        int nearest = 0;
-        float nearestDist = float.MaxValue;
-        Vector3 pos = transform.position;
+        int count = waypointPath.WaypointCount;
+        if (count < 2) return Vector3.zero;
 
-        for (int i = 0; i < waypointPath.WaypointCount; i++)
+        Vector3 pos = transform.position; pos.y = 0f;
+
+        int bestSegStart = 0;
+        float bestDistSq = float.MaxValue;
+        for (int i = 0; i < count; i++)
         {
-            Transform wp = waypointPath.GetWaypoint(i);
-            if (wp == null) continue;
-            float d = (wp.position - pos).sqrMagnitude;
-            if (d < nearestDist) { nearestDist = d; nearest = i; }
+            Transform a = waypointPath.GetWaypoint(i);
+            Transform b = waypointPath.GetWaypoint(i + 1);
+            if (a == null || b == null) continue;
+
+            Vector3 ap = a.position; ap.y = 0f;
+            Vector3 bp = b.position; bp.y = 0f;
+            Vector3 ab = bp - ap;
+            float abLenSq = ab.sqrMagnitude;
+            if (abLenSq < 0.0001f) continue;
+
+            float t = Mathf.Clamp01(Vector3.Dot(pos - ap, ab) / abLenSq);
+            Vector3 projected = ap + ab * t;
+            float dSq = (pos - projected).sqrMagnitude;
+            if (dSq < bestDistSq) { bestDistSq = dSq; bestSegStart = i; }
         }
 
-        Transform a = waypointPath.GetWaypoint(nearest);
-        Transform b = waypointPath.GetWaypoint(nearest + 1);
-        if (a == null || b == null) return Vector3.zero;
+        Transform segA = waypointPath.GetWaypoint(bestSegStart);
+        Transform segB = waypointPath.GetWaypoint(bestSegStart + 1);
+        if (segA == null || segB == null) return Vector3.zero;
 
-        Vector3 dir = b.position - a.position;
+        Vector3 dir = segB.position - segA.position;
         dir.y = 0f;
         return dir.normalized;
     }
