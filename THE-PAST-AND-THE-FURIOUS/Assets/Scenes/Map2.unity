@@ -6628,6 +6628,7 @@ MonoBehaviour:
   spawnPoint: {fileID: 0}
   defaultIndex: 0
   disableHeadlights: 0
+  vfxPrefab: {fileID: 3302691358727123904, guid: 13622ab161f55634281c67f05148d49b, type: 3}
 --- !u!4 &159727179
 Transform:
   m_ObjectHideFlags: 0
@@ -21631,6 +21632,12 @@ MonoBehaviour:
   raceType: 1
   totalLaps: 3
   disableHeadlights: 0
+  aiPassableNamePrefixes:
+  - Cone
+  - Barricade
+  - WoodBarricade
+  - StoneBarricade
+  - CarCrash
   logSpawns: 1
 --- !u!4 &514058739
 Transform:
@@ -55264,13 +55271,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1279608716}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.72495764, z: -0, w: 0.6887934}
-  m_LocalPosition: {x: -441.6, y: -44.8, z: 431.5}
+  m_LocalRotation: {x: -0, y: -0.46154717, z: -0, w: 0.8871157}
+  m_LocalPosition: {x: -428.77, y: 6.8, z: 15.29}
   m_LocalScale: {x: 0.63762, y: 0.42899072, z: 0.20633462}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1806471392}
-  m_LocalEulerAnglesHint: {x: 0, y: -92.931, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -54.974, z: 0}
 --- !u!114 &1279608718
 MonoBehaviour:
   m_ObjectHideFlags: 0
