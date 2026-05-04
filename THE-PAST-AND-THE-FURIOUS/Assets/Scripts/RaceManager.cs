@@ -167,6 +167,7 @@ public class RaceManager : MonoBehaviour
                     return;
 
                 currentCheckpoint++;
+                UpdateLapUI();
 
                 if (checkpointIndex == finalCheckpointIndex)
                     StartCoroutine(FinishRace());
@@ -177,10 +178,6 @@ public class RaceManager : MonoBehaviour
     private IEnumerator FinishRace()
     {
         raceFinished = true;
-
-        // Lose if too many AI finished ahead of us. We check here (after raceFinished is set)
-        // so the player still gets the coast-out animation, then game over takes over.
-        bool playerLost = loseIfBeatenByCount > 0 && aiFinishCount >= loseIfBeatenByCount;
 
         // disable player input
         if (playerInput != null)
@@ -200,24 +197,13 @@ public class RaceManager : MonoBehaviour
         if (delayBeforeFade > 0f)
             yield return new WaitForSecondsRealtime(delayBeforeFade);
 
-        // Loss path: show GameOverScreen with the player's position. Skip the fade — the
-        // game-over panel takes over the screen and a black overlay would just hide it.
-        if (playerLost)
-        {
-            int pos = aiFinishCount + 1;
-            string suffix = PositionSuffix(pos);
-            if (gameOverScreen != null)
-                gameOverScreen.ShowGameOver($"You finished {pos}{suffix}");
-            yield break;
-        }
-
         // Persist the player's finishing position so the WinScene can show it on the podium.
         // Global key = latest race; per-scene key = used by the final win screen to summarize all 3 maps.
         int finalPos = aiFinishCount + 1;
         PlayerPrefs.SetInt("FinalPosition", finalPos);
         PlayerPrefs.SetInt("FinalPosition_" + SceneManager.GetActiveScene().name, finalPos);
 
-        // Win path: fade to black, then load the next scene.
+        // Fade to black before loading the next scene
         if (fadeGroup != null)
         {
             float t = 0f;
@@ -227,14 +213,26 @@ public class RaceManager : MonoBehaviour
                 fadeGroup.alpha = Mathf.Lerp(0f, 1f, t / fadeDuration);
                 yield return null;
             }
-
             fadeGroup.alpha = 1f;
         }
 
-        if (!string.IsNullOrEmpty(nextSceneName))
+        // Compute next scene by cycling through Map1/2/3 from the player's chosen starting map.
+        // After 3 maps played, head to the final win cutscene.
+        int played = PlayerPrefs.GetInt("MapsPlayed", 0) + 1;
+        PlayerPrefs.SetInt("MapsPlayed", played);
+        PlayerPrefs.Save();
+        string nextScene;
+        if (played >= 3)
         {
-            SceneManager.LoadScene(nextSceneName);
+            nextScene = "AztecWinScene";
         }
+        else
+        {
+            int startIdx = PlayerPrefs.GetInt("StartMapIdx", 0);
+            int nextIdx = (startIdx + played) % 3;
+            nextScene = "Map" + (nextIdx + 1);
+        }
+        SceneManager.LoadScene(nextScene);
     }
 
     static string PositionSuffix(int n)
@@ -266,8 +264,12 @@ public class RaceManager : MonoBehaviour
         return nonFinishCheckpointCount;
     }
 
-    void UpdateLapUI() 
-    { 
-        if (lapText != null) lapText.text = "Lap " + currentLap + " / " + totalLaps; 
+    void UpdateLapUI()
+    {
+        if (lapText == null) return;
+        if (raceType == RaceType.Checkpoints)
+            lapText.text = "Checkpoint " + currentCheckpoint + " / " + (finalCheckpointIndex + 1);
+        else
+            lapText.text = "Lap " + currentLap + " / " + totalLaps;
     }
 }

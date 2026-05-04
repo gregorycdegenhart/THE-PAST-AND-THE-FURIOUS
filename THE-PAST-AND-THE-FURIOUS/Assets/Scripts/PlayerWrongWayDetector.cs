@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerWrongWayDetector : MonoBehaviour
@@ -29,7 +30,32 @@ public class PlayerWrongWayDetector : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+    }
+
+    void Start()
+    {
+        if (waypointPath == null) waypointPath = FindFirstObjectByType<AIWaypointPath>();
+        if (wrongWayPanel == null)
+        {
+            foreach (var canv in FindObjectsByType<Canvas>(FindObjectsSortMode.None))
+            {
+                var found = FindDeep(canv.transform, "WrongWayPanel");
+                if (found != null) { wrongWayPanel = found.gameObject; break; }
+            }
+        }
         if (wrongWayPanel != null) wrongWayPanel.SetActive(false);
+    }
+
+    static Transform FindDeep(Transform parent, string name)
+    {
+        if (parent == null) return null;
+        if (parent.name == name) return parent;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform found = FindDeep(parent.GetChild(i), name);
+            if (found != null) return found;
+        }
+        return null;
     }
 
     void FixedUpdate()
