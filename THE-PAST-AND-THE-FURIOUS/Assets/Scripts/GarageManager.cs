@@ -251,6 +251,9 @@ public float cameraRotateSpeed = 5f;
         PlayerPrefs.SetInt("SelectedCarColor", selectedDisplayCarIndex);
         PlayerPrefs.SetString("SelectedCarName", car.carName);
         PlayerPrefs.SetString("SelectedDriverName", drivers[selectedDriverIndex].driverName);
+        // Cycle: starting map index (0/1/2) + played counter so RaceManager can route through all 3 maps regardless of selection.
+        PlayerPrefs.SetInt("StartMapIdx", selectedCarIndex);
+        PlayerPrefs.SetInt("MapsPlayed", 0);
         PlayerPrefs.Save();
 
         if (cutsceneManager != null)

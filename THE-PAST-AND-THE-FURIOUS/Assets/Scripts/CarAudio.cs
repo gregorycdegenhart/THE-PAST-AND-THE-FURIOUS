@@ -5,7 +5,7 @@ public class CarAudio : MonoBehaviour
     [Header("Engine")]
     public float minPitch = 0.6f;
     public float maxPitch = 2.0f;
-    public float engineVolume = 0.3f;
+    public float engineVolume = 0.15f;
 
     [Header("SFX")]
     public float turboVolume = 0.5f;

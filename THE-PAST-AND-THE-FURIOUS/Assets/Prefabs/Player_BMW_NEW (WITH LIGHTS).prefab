@@ -275,6 +275,7 @@ GameObject:
   - component: {fileID: 1300802771213469182}
   - component: {fileID: 6610982446473135157}
   - component: {fileID: 5450050395786932554}
+  - component: {fileID: 4132282983357343489}
   m_Layer: 0
   m_Name: Player_BMW_NEW (WITH LIGHTS)
   m_TagString: Player
@@ -512,7 +513,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CarAudio
   minPitch: 0.6
   maxPitch: 2
-  engineVolume: 0.3
+  engineVolume: 0.15
   turboVolume: 0.5
   checkpointVolume: 0.6
 --- !u!114 &1300802771213469182
@@ -562,6 +563,23 @@ MonoBehaviour:
   brakelights:
   - {fileID: 2879096470650200643}
   - {fileID: 1152759336654377172}
+--- !u!114 &4132282983357343489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 270355423608437863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b037d08b900b0c0418df8f1f6c71668c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerWrongWayDetector
+  waypointPath: {fileID: 0}
+  minSpeed: 4
+  wrongWayDotThreshold: -0.3
+  sustainSeconds: 1
+  wrongWayPanel: {fileID: 0}
 --- !u!1 &4735816757262341899
 GameObject:
   m_ObjectHideFlags: 0

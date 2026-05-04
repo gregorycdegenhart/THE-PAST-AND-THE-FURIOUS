@@ -257,7 +257,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CarAudio
   minPitch: 0.6
   maxPitch: 2
-  engineVolume: 0.3
+  engineVolume: 0.15
   turboVolume: 0.5
   checkpointVolume: 0.6
 --- !u!114 &3841422062569687392
@@ -273,7 +273,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WheelColliders
   radius: 0.3
-  height: 0.3
 --- !u!114 &1563413114860282119
 MonoBehaviour:
   m_ObjectHideFlags: 0
